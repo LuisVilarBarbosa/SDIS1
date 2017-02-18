@@ -21,16 +21,17 @@ public class Client {
 		try {
 			socket = new DatagramSocket();
 			InetAddress address = InetAddress.getByName(hostName);
-			
-			msgReceived = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH, address, serverPort);
-			msgToSend = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH, address, serverPort);
+			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
+			msgToSend = new DatagramPacket(data, data.length, address, serverPort);
 			String str = args[2];
 			for(int i = 3; i < args.length; i++)
 				str += " " + args[i];
 			msgToSend.setData(str.getBytes());
-
 			socket.send(msgToSend);
+
+			//msgReceived = new DatagramPacket(data, data.length, address, serverPort);
+
 			socket.close();
 			//socket·;
 		} catch (SocketException e) {

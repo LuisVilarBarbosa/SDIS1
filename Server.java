@@ -21,15 +21,16 @@ public class Server {
 		DatagramPacket msgToSend;
 		try {
 			socket = new DatagramSocket(serverPort);
+			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
 			while(true) {
-				msgReceived = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH);
-				msgToSend = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH);
-
+				msgReceived = new DatagramPacket(data, data.length);
 				socket.receive(msgReceived);
 
 				//Processing the message
 				System.out.println(msgReceived.getData());
+
+				msgToSend = new DatagramPacket(data, data.length);
 			}
 
 			//socket·;
