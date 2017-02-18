@@ -15,22 +15,19 @@ public class Client {
 		String hostName = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
-		DatagramSocket socket;
-		DatagramPacket msgReceived;
-		DatagramPacket msgToSend;
 		try {
-			socket = new DatagramSocket();
+			DatagramSocket socket = new DatagramSocket();
 			InetAddress address = InetAddress.getByName(hostName);
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
-			msgToSend = new DatagramPacket(data, data.length, address, serverPort);
+			DatagramPacket msgToSend = new DatagramPacket(data, data.length, address, serverPort);
 			String str = args[2];
 			for(int i = 3; i < args.length; i++)
 				str += " " + args[i];
 			msgToSend.setData(str.getBytes());
 			socket.send(msgToSend);
 
-			//msgReceived = new DatagramPacket(data, data.length, address, serverPort);
+			//DatagramPacket msgReceived = new DatagramPacket(data, data.length, address, serverPort);
 
 			socket.close();
 			//socket·;
