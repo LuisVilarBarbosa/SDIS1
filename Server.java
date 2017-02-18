@@ -9,7 +9,6 @@ public class Server {
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 
 	public static void main(String[] args) {
-
 		if(args.length != 1) {
 			System.out.println("Usage: java Server <port_number>");
 			return;

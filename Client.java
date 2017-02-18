@@ -20,10 +20,10 @@ public class Client {
 		DatagramPacket msgToSend;
 		try {
 			socket = new DatagramSocket();
-
-			//TODO Modificar a chamada dos DatagramPacket para incluir address 
-			msgReceived = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH);
-			msgToSend = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH);
+			InetAddress address = InetAddress.getByName(hostName);
+			
+			msgReceived = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH, address, serverPort);
+			msgToSend = new DatagramPacket(new byte[UDP_DATAGRAM_MAX_LENGTH], UDP_DATAGRAM_MAX_LENGTH, address, serverPort);
 
 			String str = args[2];
 			for(int i = 3; i < args.length; i++)
