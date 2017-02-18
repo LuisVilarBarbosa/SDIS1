@@ -1,3 +1,5 @@
+package SDIS;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -25,9 +27,17 @@ public class Server {
 				socket.receive(msgReceived);
 
 				//Processing the message
-				System.out.println(new String(msgReceived.getData(), 0, msgReceived.getLength()));
+				String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
+				System.out.println(msgText);
 
-				//DatagramPacket msgToSend = new DatagramPacket(data, data.length);
+				//Prepare the response
+				InetAddress clientAddress = msgReceived.getAddress();
+				int clientPort = msgReceived.getPort();
+				DatagramPacket msgToSend = new DatagramPacket(data, data.length, clientAddress, clientPort);
+				String response = "Received the message: " + msgText;
+				msgToSend.setData(response.getBytes());
+				
+				socket.send(msgToSend);
 			}
 
 			//socket·;
