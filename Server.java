@@ -25,7 +25,7 @@ public class Server {
 				socket.receive(msgReceived);
 
 				//Processing the message
-				System.out.println(msgReceived.getData());
+				System.out.println(new String(msgReceived.getData()));
 
 				//DatagramPacket msgToSend = new DatagramPacket(data, data.length);
 			}
