@@ -8,7 +8,7 @@ public class Client {
 
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
-			System.out.println("Usage: java Client <hostname> <portnumber> <operation> <operands> [operand]");
+			System.out.println("Usage: java Client <host_name> <port_number> <oper> <opnd> [opnd]");
 			return;
 		}
 
