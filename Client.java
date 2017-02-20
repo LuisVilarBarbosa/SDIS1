@@ -50,10 +50,10 @@ public class Client {
 
 			//Construct message
 			DatagramPacket msgToSend = new DatagramPacket(data, data.length, address, serverPort);
-			String str = args[2];
+			StringBuilder sb = new StringBuilder(args[2]);
 			for(int i = 3; i < args.length; i++)
-				str += " " + args[i];
-			msgToSend.setData(str.getBytes());
+				sb.append(" ").append(args[i]);
+			msgToSend.setData(sb.toString().getBytes());
 			
 			socket.send(msgToSend);
 
