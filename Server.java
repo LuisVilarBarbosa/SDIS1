@@ -41,10 +41,7 @@ public class Server {
 				String splittedMsg[] = msgText.split(" ");
 				String oper = splittedMsg[0];
 
-				if(splittedMsg.length < 2) {
-					continue;	// Ignore malformed messages
-				}
-				else if(oper.equalsIgnoreCase("register")) {
+				if(oper.equalsIgnoreCase("register") && splittedMsg.length >= 3) {
 					String plateNumber = splittedMsg[1];
 					StringBuilder ownerName = new StringBuilder(splittedMsg[2]);
 					for (int i = 3; i < splittedMsg.length; i++)
@@ -57,7 +54,7 @@ public class Server {
 						response = Integer.toString(plateList.size());
 					}
 				}
-				else if(oper.equalsIgnoreCase("lookup")) {
+				else if(oper.equalsIgnoreCase("lookup") && splittedMsg.length == 2) {
 					String plateNumber = splittedMsg[1];
 					boolean found = false;
 					for(Plate p : plateList) {
