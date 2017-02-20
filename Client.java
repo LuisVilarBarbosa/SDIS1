@@ -38,7 +38,7 @@ public class Client {
 
 		// Build majority of output response
 		StringBuilder response = new StringBuilder();
-		for(int i = 1; i < args.length; i++)
+		for(int i = 2; i < args.length; i++)
 			response.append(args[i]).append(" ");
 		response.append(": ");
 
