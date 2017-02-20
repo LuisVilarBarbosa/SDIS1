@@ -36,6 +36,12 @@ public class Client {
 		String hostName = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
+		// Build majority of output response
+		StringBuilder response = new StringBuilder();
+		for(int i = 1; i < args.length; i++)
+			response.append(args[i]).append(" ");
+		response.append(": ");
+
 		try {
 			DatagramSocket socket = new DatagramSocket();
 			socket.setSoTimeout(3000); //3 sec
@@ -54,17 +60,19 @@ public class Client {
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, address, serverPort);
 			socket.receive(msgReceived);
 			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			System.out.println(msgText);
+			response.append(msgText);
 
 			socket.close();
 			//socket·;
 		} catch (SocketTimeoutException e) {
-			System.out.println("Timeout reached");
+			response.append("ERROR");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		System.out.println(response);
 	}
 
 }

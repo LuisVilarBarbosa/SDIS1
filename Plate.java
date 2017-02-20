@@ -41,4 +41,15 @@ public class Plate {
 		else
 			this.plateNumber = "INVALID";
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Plate)) return false;
+
+		Plate plate = (Plate) o;
+
+		if (plateNumber != null ? !plateNumber.equals(plate.plateNumber) : plate.plateNumber != null) return false;
+		return ownerName != null ? ownerName.equals(plate.ownerName) : plate.ownerName == null;
+	}
 }

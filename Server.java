@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class Server {
 
@@ -16,7 +17,7 @@ public class Server {
 			return;
 		}
 
-		Plate[] plateList;
+		ArrayList<Plate> plateList = new ArrayList<>();
 		int serverPort = Integer.parseInt(args[0]);
 
 		try {
@@ -31,18 +32,48 @@ public class Server {
 				String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
 				System.out.println(msgText);
 
-				// Ignore malformed messages
-				String lcMsgText = msgText.toLowerCase();
-				if(!lcMsgText.startsWith("register ") && !lcMsgText.startsWith("lookup "))
-					continue;
-
 				//Prepare the response
 				InetAddress clientAddress = msgReceived.getAddress();
 				int clientPort = msgReceived.getPort();
 				DatagramPacket msgToSend = new DatagramPacket(data, data.length, clientAddress, clientPort);
-				String response = "Received the message: " + msgText;
+				String response = "";
+
+				String splittedMsg[] = msgText.split(" ");
+				String oper = splittedMsg[0];
+
+				if(splittedMsg.length < 2) {
+					continue;	// Ignore malformed messages
+				}
+				else if(oper.equalsIgnoreCase("register")) {
+					String plateNumber = splittedMsg[1];
+					StringBuilder ownerName = new StringBuilder();
+					for (int i = 2; i < args.length; i++)
+						ownerName.append(args[i]);
+					Plate p = new Plate(plateNumber, ownerName.toString());
+					if(plateList.contains(p))
+						response = "-1";
+					else {
+						plateList.add(p);
+						response = Integer.toString(plateList.size());
+					}
+				}
+				else if(oper.equalsIgnoreCase("lookup")) {
+					String plateNumber = splittedMsg[1];
+					boolean found = false;
+					for(Plate p : plateList) {
+						if(p.getPlateNumber().equals(plateNumber)) {
+							found = true;
+							response = p.getOwnerName();
+						}
+					}
+					if(!found)
+						response = "NOT_FOUND";
+				}
+				else {
+					continue;	// Ignore malformed messages
+				}
+
 				msgToSend.setData(response.getBytes());
-				
 				socket.send(msgToSend);
 			}
 
