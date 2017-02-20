@@ -8,11 +8,9 @@ public class Client {
 
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 
-	private Plate plate;
-
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
-			System.out.println("Usage: java Client <host_name> <port_number> <oper> <opnd> [opnd]");
+			System.out.println("Usage: java Client <host_name> <port_number> <oper> <platenumber> [ownername]");
 			return;
 		}
 		
@@ -22,7 +20,18 @@ public class Client {
 			System.out.println("Operation should be [lookup | register]");
 			return;
 		}
-
+		
+		Plate plate;
+		
+		if(args.length == 4) {
+			plate = new Plate(args[3], "NoOwner");
+		} else if(args.length == 5) {
+			plate = new Plate(args[3], args[4]);
+		} else {
+			//error
+			return;
+		}
+		
 		String hostName = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
@@ -55,14 +64,6 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public Plate getPlate() {
-		return plate;
-	}
-
-	public void setPlate(Plate plate) {
-		this.plate = plate;
 	}
 
 }
