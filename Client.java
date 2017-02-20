@@ -28,7 +28,7 @@ public class Client {
 		} else if(args.length == 5) {
 			plate = new Plate(args[3], args[4]);
 		} else {
-			//error
+			//error - this never happens if the args.length verification is well done
 			return;
 		}
 		
