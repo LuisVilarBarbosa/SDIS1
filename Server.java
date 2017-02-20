@@ -31,6 +31,11 @@ public class Server {
 				String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
 				System.out.println(msgText);
 
+				// Ignore malformed messages
+				String lcMsgText = msgText.toLowerCase();
+				if(!lcMsgText.startsWith("register ") && !lcMsgText.startsWith("lookup "))
+					continue;
+
 				//Prepare the response
 				InetAddress clientAddress = msgReceived.getAddress();
 				int clientPort = msgReceived.getPort();

@@ -15,9 +15,10 @@ public class Client {
 		}
 		
 		//Verify oper
-		if(!Objects.equals(args[2], "lookup") && !Objects.equals(args[2], "register"))
+		String oper = args[2];
+		if(!oper.equalsIgnoreCase("register") && !oper.equalsIgnoreCase("lookup"))
 		{
-			System.out.println("Operation should be [lookup | register]");
+			System.out.println("Operation should be [register | lookup]");
 			return;
 		}
 		
