@@ -7,6 +7,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 public class Server {
+	
+	private Plate[] plateList;
 
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 
@@ -47,6 +49,14 @@ public class Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Plate[] getPlateList() {
+		return plateList;
+	}
+
+	public void setPlateList(Plate[] plateList) {
+		this.plateList = plateList;
 	}
 
 }

@@ -2,15 +2,24 @@ package SDIS;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Objects;
 
 public class Client {
 
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 
+	private Plate plate;
 
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
 			System.out.println("Usage: java Client <host_name> <port_number> <oper> <opnd> [opnd]");
+			return;
+		}
+		
+		//Verify oper
+		if(!Objects.equals(args[2], "lookup") && !Objects.equals(args[2], "register"))
+		{
+			System.out.println("Operation should be [lookup | register]");
 			return;
 		}
 
@@ -46,6 +55,14 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Plate getPlate() {
+		return plate;
+	}
+
+	public void setPlate(Plate plate) {
+		this.plate = plate;
 	}
 
 }

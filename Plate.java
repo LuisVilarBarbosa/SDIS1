@@ -24,15 +24,18 @@ public class Plate {
 	
 	public boolean validatePlate(String plateNumber)
 	{
+		//Evaluates if the Regex expression is valid
 		Pattern platePattern = Pattern.compile(platePatternExpression);
 		Matcher m = platePattern.matcher(plateNumber);
 		
+		//Tries to find a match in the string given to the matcher
 		return m.find();
 	}
 	
 	public Plate(String plateNumber, String ownerName)
 	{
 		this.ownerName = ownerName;
+		
 		if(validatePlate(plateNumber))
 			this.plateNumber = plateNumber;
 		else
