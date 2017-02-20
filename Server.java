@@ -46,9 +46,9 @@ public class Server {
 				}
 				else if(oper.equalsIgnoreCase("register")) {
 					String plateNumber = splittedMsg[1];
-					StringBuilder ownerName = new StringBuilder();
-					for (int i = 2; i < args.length; i++)
-						ownerName.append(args[i]);
+					StringBuilder ownerName = new StringBuilder(splittedMsg[2]);
+					for (int i = 3; i < splittedMsg.length; i++)
+						ownerName.append(" ").append(splittedMsg[i]);
 					Plate p = new Plate(plateNumber, ownerName.toString());
 					if(plateList.contains(p))
 						response = "-1";
