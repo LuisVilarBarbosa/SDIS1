@@ -1,5 +1,12 @@
 package SDIS;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,6 +39,18 @@ public class Plate {
 		return m.find();
 	}
 	
+	public DatagramPacket toDatagramPacket(InetAddress address, int port) throws IOException {
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
+		objectStream.writeObject(this);
+		objectStream.close();
+		
+		byte[] serializedPlate = byteStream.toByteArray();
+		
+		return new DatagramPacket(serializedPlate, serializedPlate.length, address, port);
+		//TODO Substitute length for UDP_DATAGRAM_MAX_LENGTH??
+	}
+	
 	public Plate(String plateNumber, String ownerName)
 	{
 		this.ownerName = ownerName;
@@ -40,5 +59,16 @@ public class Plate {
 			this.plateNumber = plateNumber;
 		else
 			this.plateNumber = "INVALID";
+	}
+	
+	public Plate(DatagramPacket packet) throws IOException, ClassNotFoundException
+	{
+		ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
+		Plate receivedPlate = (Plate) inputStream.readObject();
+		inputStream.close();
+		
+		this.ownerName = receivedPlate.ownerName;
+		this.plateNumber = receivedPlate.plateNumber;
+		
 	}
 }

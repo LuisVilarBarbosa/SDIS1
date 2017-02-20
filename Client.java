@@ -1,6 +1,8 @@
 package SDIS;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.*;
 import java.util.Objects;
 
@@ -22,14 +24,15 @@ public class Client {
 		}
 		
 		Plate plate;
+		Plate plateReceived;
 		
 		if(args.length == 4) {
-			plate = new Plate(args[3], "NoOwner");
+			plate = new Plate(args[3], "InsertOwner");
 		} else if(args.length == 5) {
 			plate = new Plate(args[3], args[4]);
 		} else {
-			//error
-			return;
+			//TODO error. Add a exception
+			return;	
 		}
 		
 		String hostName = args[0];
@@ -42,28 +45,41 @@ public class Client {
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
 			//Construct message
+			/*
 			DatagramPacket msgToSend = new DatagramPacket(data, data.length, address, serverPort);
 			String str = args[2];
 			for(int i = 3; i < args.length; i++)
 				str += " " + args[i];
-			msgToSend.setData(str.getBytes());
+			msgToSend.setData(str.getBytes());*/
+			
+			DatagramPacket msgToSend = plate.toDatagramPacket(address, serverPort);
 			
 			socket.send(msgToSend);
 
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, address, serverPort);
 			socket.receive(msgReceived);
-			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			System.out.println(msgText);
+			
+			plateReceived = new Plate(msgReceived);
+			if(args.length == 4) {
+				System.out.println(plateReceived.getPlateNumber() + " belongs to " + plateReceived.getOwnerName());
+			} else if(args.length == 5) {
+				//In this case, the owner name carries the server acknowledge/error message
+				System.out.println(plateReceived.getOwnerName());
+			} else {
+				//TODO error. Add an exception
+				return;
+			}
 
 			socket.close();
-			//socket·;
+			
 		} catch (SocketTimeoutException e) {
 			System.out.println("Timeout reached");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
-
 }
