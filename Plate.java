@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Plate {
-	public static final String platePatternExpression = "^([0-9A-Z]{2}-){2}([0-9A-Z])";
+	public static final String platePatternExpression = "^([0-9A-Z]{2}-){2}([0-9A-Z]{2})$";
 	
 	private String plateNumber;
 	private String ownerName;
