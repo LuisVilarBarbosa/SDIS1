@@ -47,8 +47,12 @@ public class Server {
 					for (int i = 3; i < splittedMsg.length; i++)
 						ownerName.append(" ").append(splittedMsg[i]);
 					Plate p = new Plate(plateNumber, ownerName.toString());
-					if(plateList.contains(p))
-						response = "-1";
+					if(plateList.contains(p)) {
+						response = "-1 \nALREADY EXISTS";
+					}
+					else if(p.getPlateNumber().equalsIgnoreCase("INVALID")) {
+						response = "-1 \nINVALID PLATE. Format XX-XX-XX. X = [A-Z0-9]";
+					}
 					else {
 						plateList.add(p);
 						response = Integer.toString(plateList.size());

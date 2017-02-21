@@ -29,7 +29,7 @@ public class Plate {
 		Matcher m = platePattern.matcher(plateNumber);
 		
 		//Tries to find a match in the string given to the matcher
-		return m.find();
+		return m.matches();
 	}
 	
 	public Plate(String plateNumber, String ownerName)
