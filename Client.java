@@ -2,7 +2,6 @@ package SDIS;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.Objects;
 
 public class Client {
 
@@ -19,17 +18,6 @@ public class Client {
 		if(!oper.equalsIgnoreCase("register") && !oper.equalsIgnoreCase("lookup"))
 		{
 			System.out.println("Operation should be [register | lookup]");
-			return;
-		}
-		
-		Plate plate;
-		
-		if(args.length == 4) {
-			plate = new Plate(args[3], "NoOwner");
-		} else if(args.length == 5) {
-			plate = new Plate(args[3], args[4]);
-		} else {
-			//error - this never happens if the args.length verification is well done
 			return;
 		}
 		

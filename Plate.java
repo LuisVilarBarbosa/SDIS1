@@ -12,14 +12,8 @@ public class Plate {
 	public String getPlateNumber() {
 		return plateNumber;
 	}
-	public void setPlateNumber(String plateNumber) {
-		this.plateNumber = plateNumber;
-	}
 	public String getOwnerName() {
 		return ownerName;
-	}
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
 	}
 	
 	public boolean validatePlate(String plateNumber)
