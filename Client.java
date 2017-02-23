@@ -12,15 +12,15 @@ public class Client {
 			System.out.println("Usage: java Client <host_name> <port_number> <oper> <platenumber> [ownername]");
 			return;
 		}
-		
+
 		//Verify oper
 		String oper = args[2];
-		if(!oper.equalsIgnoreCase("register") && !oper.equalsIgnoreCase("lookup"))
-		{
-			System.out.println("Operation should be [register | lookup]");
+		if((!oper.equalsIgnoreCase("register") && args.length == 5) ||
+				(!oper.equalsIgnoreCase("lookup") && args.length == 4)) {
+			System.out.println("Operation should be [register | lookup] with [5 | 4] arguments");
 			return;
 		}
-		
+
 		String hostName = args[0];
 		int serverPort = Integer.parseInt(args[1]);
 
@@ -42,7 +42,7 @@ public class Client {
 			for(int i = 3; i < args.length; i++)
 				sb.append(" ").append(args[i]);
 			msgToSend.setData(sb.toString().getBytes());
-			
+
 			socket.send(msgToSend);
 
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, address, serverPort);
