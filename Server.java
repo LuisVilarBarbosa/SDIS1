@@ -26,6 +26,7 @@ public class Server {
 			socket.setTimeToLive(1); //To avoid network congestion
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
+			int i = 0;
 			while(true) {
 				//Prepare the multicast message to diffuse
 				InetAddress multicastAddress = InetAddress.getByName(args[1]);
@@ -33,18 +34,17 @@ public class Server {
 				DatagramPacket msgToDiffuse = new DatagramPacket(data, data.length, multicastAddress, multicastPort);
 				
 				StringBuilder mcastMessage = new StringBuilder("multicast:");
-				mcastMessage.append(args[1]).append(" ").append(args[2]).append(":");
 				mcastMessage.append(InetAddress.getLocalHost().getHostAddress()).append(" ").append(args[0]);
-				
 				
 				
 				msgToDiffuse.setData(mcastMessage.toString().getBytes());
 				socket.send(msgToDiffuse);
 				
-				System.out.println(mcastMessage.toString());
+				System.out.println(mcastMessage.toString() + " " + i);
 				
 				//Just for avoiding overflood
 				Thread.sleep(1000);
+				i++;
 			}
 		} catch (SocketException e) {
 			e.printStackTrace();

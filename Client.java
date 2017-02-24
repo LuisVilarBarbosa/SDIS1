@@ -9,10 +9,10 @@ public class Client {
 
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
-			System.out.println("Usage: java Client <host_name> <port_number> <oper> <platenumber> [ownername]");
+			System.out.println("Usage: java Client <mcast_addr> <mcast_port> <oper> <platenumber> [ownername]");
 			return;
 		}
-
+/*
 		//Verify oper
 		String oper = args[2];
 		if((!oper.equalsIgnoreCase("register") && args.length == 5) ||
@@ -20,21 +20,30 @@ public class Client {
 			System.out.println("Operation should be [register | lookup] with [5 | 4] arguments");
 			return;
 		}
-
-		String hostName = args[0];
-		int serverPort = Integer.parseInt(args[1]);
-
+*/
+		String groupAddress = args[0];
+		int groupPort = Integer.parseInt(args[1]);
+/*
 		// Build majority of output response
 		StringBuilder response = new StringBuilder();
 		for(int i = 2; i < args.length; i++)
 			response.append(args[i]).append(" ");
 		response.append(": ");
-
+*/
 		try {
-			DatagramSocket socket = new DatagramSocket();
+			MulticastSocket socket = new MulticastSocket(groupPort);
+			socket.joinGroup(InetAddress.getByName(groupAddress));
 			socket.setSoTimeout(3000); //3 sec
-			InetAddress address = InetAddress.getByName(hostName);
+			socket.setTimeToLive(1);
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
+			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
+			socket.receive(mcastReceive);
+			
+			System.out.println(new String(data));
+			
+			
+			/*
+			//InetAddress serveraddr = InetAddress.getByName(groupAddress);
 
 			//Construct message
 			DatagramPacket msgToSend = new DatagramPacket(data, data.length, address, serverPort);
@@ -51,16 +60,17 @@ public class Client {
 			response.append(msgText);
 
 			socket.close();
-			//socket·;
+			//socket·;*/
 		} catch (SocketTimeoutException e) {
-			response.append("ERROR");
+			//response.append("ERROR");
+			System.out.println("Timeout");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		System.out.println(response);
+		//System.out.println(response);
 	}
 
 }
