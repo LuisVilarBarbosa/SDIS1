@@ -14,7 +14,7 @@ public class Server {
 
 	public static void main(String[] args) {
 		if(args.length != 3) {
-			System.out.println("Usage: java Server <port_number> <mcast_addr> <mcast_port>");
+			System.out.println("Usage: java Server <srvc_port> <mcast_addr> <mcast_port>");
 			return;
 		}
 
