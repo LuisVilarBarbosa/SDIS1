@@ -39,7 +39,7 @@ public class Client {
 			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
 			socket.receive(mcastReceive);
 			
-			System.out.println(new String(data));
+			System.out.println(new String(data, 0, mcastReceive.getLength()));
 			
 			
 			/*
