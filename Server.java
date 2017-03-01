@@ -47,7 +47,7 @@ public class Server {
 		ArrayList<Plate> plateList = new ArrayList<>();
 
 		try {
-			MulticastSocket socket = generateSocket();
+			MulticastSocket socket = generateSocket(); //ATENCAO Aqui não é DatagramSocket? Aqui é so um socket para uma ligação 1Cliente - 1Servidor
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length);
 
@@ -130,7 +130,7 @@ public class Server {
 				public void run() {
 					requestsProcessor();
 				}
-			};
+			}; //ATENCAO Não falta um t2.run()?
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}

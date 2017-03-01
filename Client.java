@@ -39,20 +39,43 @@ public class Client {
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
 			socket.receive(mcastReceive);
-			String msgReceived = new String(data, 0, mcastReceive.getLength());
+			String msgMulticastReceived = new String(data, 0, mcastReceive.getLength());
+			socket.close();
+			
+			System.out.println(msgMulticastReceived);
 			
 			//String treatment
-			System.out.println(msgReceived);
-			String[] filter1 = msgReceived.split(":"); //remove "multicast:"
-			String addressAndPort = filter1[1];
-			//TODO rest of string treatment
+			String[] filter = msgMulticastReceived.split(":"); //remove "multicast:"
+			String addressAndPort = filter[1];
+			addressAndPort.trim();
+			filter = addressAndPort.split(" "); //Separate Address from Port
+			
+			System.out.println("Filter: " + filter[0] + " " + filter[1]);
 			
 			DatagramSocket serverConnectionSocket = new DatagramSocket();
-			socket.setSoTimeout(3000); //3 sec
+			serverConnectionSocket.setSoTimeout(3000); //3 sec
+			InetAddress serverAddress = InetAddress.getByName(filter[0]);
+			int serverPort = Integer.parseInt(filter[1]);
 			
+			//Construct message
+			DatagramPacket msgToSend = new DatagramPacket(data, data.length, serverAddress, serverPort);
+			StringBuilder sb = new StringBuilder(args[2]);
+			for(int i = 3; i < args.length; i++)
+				sb.append(" ").append(args[i]);
+			msgToSend.setData(sb.toString().getBytes());
 			
-			InetAddress serverAddress = InetAddress.getByName();
+			serverConnectionSocket.send(msgToSend);
 			
+			DatagramPacket msgReceived = new DatagramPacket(data, data.length, serverAddress, serverPort);
+			serverConnectionSocket.receive(msgReceived);
+			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
+			StringBuilder response = new StringBuilder();
+			for(int i = 2; i < args.length; i++)
+				response.append(args[i]).append(" ");
+			response.append(": ");
+			response.append(msgText);
+			
+			serverConnectionSocket.close();
 			/*
 			//InetAddress serveraddr = InetAddress.getByName(groupAddress);
 
