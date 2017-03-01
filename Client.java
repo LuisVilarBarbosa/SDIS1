@@ -32,15 +32,26 @@ public class Client {
 */
 		try {
 			MulticastSocket socket = new MulticastSocket(groupPort);
+			System.out.println(groupAddress);
 			socket.joinGroup(InetAddress.getByName(groupAddress));
 			socket.setSoTimeout(3000); //3 sec
 			socket.setTimeToLive(1);
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
 			socket.receive(mcastReceive);
+			String msgReceived = new String(data, 0, mcastReceive.getLength());
 			
-			System.out.println(new String(data, 0, mcastReceive.getLength()));
+			//String treatment
+			System.out.println(msgReceived);
+			String[] filter1 = msgReceived.split(":"); //remove "multicast:"
+			String addressAndPort = filter1[1];
+			//TODO rest of string treatment
 			
+			DatagramSocket serverConnectionSocket = new DatagramSocket();
+			socket.setSoTimeout(3000); //3 sec
+			
+			
+			InetAddress serverAddress = InetAddress.getByName();
 			
 			/*
 			//InetAddress serveraddr = InetAddress.getByName(groupAddress);
