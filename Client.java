@@ -45,10 +45,7 @@ public class Client {
 			//String treatment
 			String[] filter = msgMulticastReceived.split(":"); //remove "multicast:"
 			String addressAndPort = filter[1];
-			addressAndPort.trim();
 			filter = addressAndPort.split(" "); //Separate Address from Port
-			filter[0].trim();
-			filter[1].trim();
 			
 			
 			DatagramSocket serverConnectionSocket = new DatagramSocket();
