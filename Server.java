@@ -11,12 +11,6 @@ public class Server {
 
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 	
-	private static MulticastSocket generateSocket() throws IOException {
-		MulticastSocket socket = new MulticastSocket();
-		socket.setTimeToLive(1); //To avoid network congestion
-		return socket;
-	}
-	
 	private static void advertiser(int servicePort, InetAddress multicastAddress, int multicastPort) {
 		try {
 			//Prepare the multicast message to diffuse
@@ -24,7 +18,8 @@ public class Server {
 			mcastMessage.append(InetAddress.getLocalHost().getHostAddress()).append(" ").append(servicePort);
 			String mcastMsg = mcastMessage.toString();
 
-			MulticastSocket socket = generateSocket();
+			MulticastSocket socket = new MulticastSocket();
+			socket.setTimeToLive(1); //To avoid network congestion
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket msgToDiffuse = new DatagramPacket(data, data.length, multicastAddress, multicastPort);
 			msgToDiffuse.setData(mcastMsg.getBytes());
@@ -32,7 +27,7 @@ public class Server {
 			while(true) {
 				socket.send(msgToDiffuse);
 				System.out.println(mcastMsg);
-				//Just for avoiding overflood
+				//Just to avoid flooding
 				Thread.sleep(1000);
 			}
 		} catch (UnknownHostException e) {
