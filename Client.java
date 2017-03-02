@@ -39,6 +39,7 @@ public class Client {
 			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
 			socket.receive(mcastReceive);
 			String msgMulticastReceived = new String(data, 0, mcastReceive.getLength());
+			System.out.println(msgMulticastReceived);
 			socket.close();
 			
 			
@@ -68,25 +69,6 @@ public class Client {
 			System.out.println(msgText);
 			
 			serverConnectionSocket.close();
-			/*
-			//InetAddress serveraddr = InetAddress.getByName(groupAddress);
-
-			//Construct message
-			DatagramPacket msgToSend = new DatagramPacket(data, data.length, address, serverPort);
-			StringBuilder sb = new StringBuilder(args[2]);
-			for(int i = 3; i < args.length; i++)
-				sb.append(" ").append(args[i]);
-			msgToSend.setData(sb.toString().getBytes());
-
-			socket.send(msgToSend);
-
-			DatagramPacket msgReceived = new DatagramPacket(data, data.length, address, serverPort);
-			socket.receive(msgReceived);
-			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			response.append(msgText);
-
-			socket.close();
-			//socket·;*/
 		} catch (SocketTimeoutException e) {
 			//response.append("ERROR");
 			System.out.println("Timeout");
