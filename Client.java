@@ -32,7 +32,6 @@ public class Client {
 */
 		try {
 			MulticastSocket socket = new MulticastSocket(groupPort);
-			System.out.println(groupAddress);
 			socket.joinGroup(InetAddress.getByName(groupAddress));
 			socket.setSoTimeout(3000); //3 sec
 			socket.setTimeToLive(1);
@@ -42,7 +41,6 @@ public class Client {
 			String msgMulticastReceived = new String(data, 0, mcastReceive.getLength());
 			socket.close();
 			
-			System.out.println(msgMulticastReceived);
 			
 			//String treatment
 			String[] filter = msgMulticastReceived.split(":"); //remove "multicast:"
@@ -52,7 +50,6 @@ public class Client {
 			filter[0].trim();
 			filter[1].trim();
 			
-			System.out.println("Filter: " + filter[0] + " " + filter[1]);
 			
 			DatagramSocket serverConnectionSocket = new DatagramSocket();
 			serverConnectionSocket.setSoTimeout(3000); //3 sec
@@ -71,11 +68,7 @@ public class Client {
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, serverAddress, serverPort);
 			serverConnectionSocket.receive(msgReceived);
 			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			StringBuilder response = new StringBuilder();
-			for(int i = 2; i < args.length; i++)
-				response.append(args[i]).append(" ");
-			response.append(": ");
-			response.append(msgText);
+			System.out.println(msgText);
 			
 			serverConnectionSocket.close();
 			/*
