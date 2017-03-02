@@ -129,17 +129,15 @@ public class Server {
 					advertiser(servicePort, multicastAddress, multicastPort);
 				}
 			};
-			//t1.run();
-
 			TimerTask t2 = new TimerTask() {
 				@Override
 				public void run() {
-					requestsProcessor(Integer.parseInt(args[0]));
+					requestsProcessor(servicePort);
 				}
 			};
 			
-			timerAdv.schedule(t1, 1);
-			timerReq.schedule(t2, 1);
+			timerAdv.schedule(t1, 0);
+			timerReq.schedule(t2, 0);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
