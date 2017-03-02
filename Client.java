@@ -23,13 +23,13 @@ public class Client {
 */
 		String groupAddress = args[0];
 		int groupPort = Integer.parseInt(args[1]);
-/*
+
 		// Build majority of output response
 		StringBuilder response = new StringBuilder();
 		for(int i = 2; i < args.length; i++)
 			response.append(args[i]).append(" ");
 		response.append(": ");
-*/
+
 		try {
 			MulticastSocket socket = new MulticastSocket(groupPort);
 			socket.joinGroup(InetAddress.getByName(groupAddress));
@@ -66,11 +66,11 @@ public class Client {
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, serverAddress, serverPort);
 			serverConnectionSocket.receive(msgReceived);
 			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			System.out.println(msgText);
+			response.append(msgText);
 			
 			serverConnectionSocket.close();
 		} catch (SocketTimeoutException e) {
-			//response.append("ERROR");
+			response.append("ERROR");
 			System.out.println("Timeout");
 		} catch (SocketException e) {
 			e.printStackTrace();
@@ -78,7 +78,7 @@ public class Client {
 			e.printStackTrace();
 		}
 
-		//System.out.println(response);
+		System.out.println(response);
 	}
 
 }
