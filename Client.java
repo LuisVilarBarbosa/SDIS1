@@ -49,6 +49,8 @@ public class Client {
 			String addressAndPort = filter[1];
 			addressAndPort.trim();
 			filter = addressAndPort.split(" "); //Separate Address from Port
+			filter[0].trim();
+			filter[1].trim();
 			
 			System.out.println("Filter: " + filter[0] + " " + filter[1]);
 			

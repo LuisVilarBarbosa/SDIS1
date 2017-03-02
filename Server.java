@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StreamCorruptedException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Timer;
 import java.util.TimerTask;
 
 public class Server {
@@ -43,13 +44,15 @@ public class Server {
 		}
 	}
 	
-	private static void requestsProcessor() {
+	private static void requestsProcessor(int serverPort) {
 		ArrayList<Plate> plateList = new ArrayList<>();
 
 		try {
-			MulticastSocket socket = generateSocket(); //ATENCAO Aqui não é DatagramSocket? Aqui é so um socket para uma ligação 1Cliente - 1Servidor
+			DatagramSocket socket = new DatagramSocket(serverPort);
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length);
+			
+			System.out.println("Starting receiving messages");
 
 			while(true) {
 				socket.receive(msgReceived);
@@ -116,6 +119,9 @@ public class Server {
 			int servicePort = Integer.parseInt(args[0]);
 			InetAddress multicastAddress = InetAddress.getByName(args[1]);
 			int multicastPort = Integer.parseInt(args[2]);
+			
+			Timer timerAdv = new Timer("advertiser");
+			Timer timerReq = new Timer("requestProcessor");
 
 			TimerTask t1 = new TimerTask() {
 				@Override
@@ -123,14 +129,17 @@ public class Server {
 					advertiser(servicePort, multicastAddress, multicastPort);
 				}
 			};
-			t1.run();
+			//t1.run();
 
 			TimerTask t2 = new TimerTask() {
 				@Override
 				public void run() {
-					requestsProcessor();
+					requestsProcessor(Integer.parseInt(args[0]));
 				}
-			}; //ATENCAO Não falta um t2.run()?
+			};
+			
+			timerAdv.schedule(t1, 1);
+			timerReq.schedule(t2, 1);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
