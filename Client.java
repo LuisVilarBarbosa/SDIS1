@@ -12,7 +12,7 @@ public class Client {
 			System.out.println("Usage: java Client <mcast_addr> <mcast_port> <oper> <platenumber> [ownername]");
 			return;
 		}
-/*
+
 		//Verify oper
 		String oper = args[2];
 		if((!oper.equalsIgnoreCase("register") && args.length == 5) ||
@@ -20,7 +20,7 @@ public class Client {
 			System.out.println("Operation should be [register | lookup] with [5 | 4] arguments");
 			return;
 		}
-*/
+
 		String groupAddress = args[0];
 		int groupPort = Integer.parseInt(args[1]);
 
@@ -65,8 +65,8 @@ public class Client {
 			
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length, serverAddress, serverPort);
 			serverConnectionSocket.receive(msgReceived);
-			String msgText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			response.append(msgText);
+			String msgRcvText = new String(msgReceived.getData(), 0, msgReceived.getLength());
+			response.append(msgRcvText);
 			
 			serverConnectionSocket.close();
 		} catch (SocketTimeoutException e) {

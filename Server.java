@@ -46,13 +46,12 @@ public class Server {
 			DatagramSocket socket = new DatagramSocket(serverPort);
 			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 			DatagramPacket msgReceived = new DatagramPacket(data, data.length);
-			
+
 			System.out.println("Starting receiving messages");
 
 			while(true) {
 				socket.receive(msgReceived);
-				String msgText = new String(data, 0, msgReceived.getLength());
-				System.out.println(msgText);
+				String msgRcvText = new String(data, 0, msgReceived.getLength());
 
 				//Prepare the response
 				InetAddress clientAddress = msgReceived.getAddress();
@@ -60,7 +59,7 @@ public class Server {
 				DatagramPacket msgToSend = new DatagramPacket(data, data.length, clientAddress, clientPort);
 				String response = "";
 
-				String splittedMsg[] = msgText.split(" ");
+				String splittedMsg[] = msgRcvText.split(" ");
 				String oper = splittedMsg[0];
 
 				if(oper.equalsIgnoreCase("register") && splittedMsg.length == 3) {
@@ -97,7 +96,7 @@ public class Server {
 				}
 				msgToSend.setData(response.getBytes());
 				socket.send(msgToSend);
-				System.out.println(response);
+				System.out.println(msgRcvText + " : " + response);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
