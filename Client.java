@@ -56,10 +56,13 @@ public class Client {
             response.append("ERROR");
             System.out.println("Timeout");
         } catch (SocketException e) {
+            response.append("ERROR");
             e.printStackTrace();
         } catch (UnknownHostException e) {
+            response.append("ERROR");
             e.printStackTrace();
         } catch (IOException e) {
+            response.append("ERROR");
             e.printStackTrace();
         }
 
