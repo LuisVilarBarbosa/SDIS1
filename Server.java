@@ -67,7 +67,7 @@ public class Server {
 
 				OutputStream ostream = connectionSocket.getOutputStream();
 				PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
-				prtWriter.print(response);
+				prtWriter.println(response);
 				System.out.println("Socket wrote");
 				istreamReader.close();
 				ostream.close();

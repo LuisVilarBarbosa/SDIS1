@@ -39,7 +39,7 @@ public class Client {
 
 			OutputStream ostream = serverConnectionSocket.getOutputStream();
 			PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
-			prtWriter.print(sb.toString());
+			prtWriter.println(sb.toString());
 			System.out.println("Socket wrote");
 
 			InputStreamReader istreamReader = new InputStreamReader(serverConnectionSocket.getInputStream());
