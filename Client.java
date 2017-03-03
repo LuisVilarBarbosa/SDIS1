@@ -9,7 +9,7 @@ public class Client {
 
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
-			System.out.println("Usage: java Client <mcast_addr> <mcast_port> <oper> <platenumber> [ownername]");
+			System.out.println("Usage: java Client <host_name> <port_number> <oper> <platenumber> [ownername]");
 			return;
 		}
 

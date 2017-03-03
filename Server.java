@@ -1,7 +1,10 @@
 package SDIS;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StreamCorruptedException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -11,52 +14,21 @@ public class Server {
 
 	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
 	
-	private static void advertiser(int servicePort, InetAddress multicastAddress, int multicastPort) {
-		try {
-			//Prepare the multicast message to diffuse
-			StringBuilder mcastMessage = new StringBuilder("multicast:");
-			mcastMessage.append(InetAddress.getLocalHost().getHostAddress()).append(" ").append(servicePort);
-			String mcastMsg = mcastMessage.toString();
-
-			MulticastSocket socket = new MulticastSocket();
-			socket.setTimeToLive(1); //To avoid network congestion
-			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
-			DatagramPacket msgToDiffuse = new DatagramPacket(data, data.length, multicastAddress, multicastPort);
-			msgToDiffuse.setData(mcastMsg.getBytes());
-
-			while(true) {
-				socket.send(msgToDiffuse);
-				System.out.println(mcastMsg);
-				//Just to avoid flooding
-				Thread.sleep(1000);
-			}
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 	private static void requestsProcessor(int serverPort) {
 		ArrayList<Plate> plateList = new ArrayList<>();
 
 		try {
-			DatagramSocket socket = new DatagramSocket(serverPort);
-			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
-			DatagramPacket msgReceived = new DatagramPacket(data, data.length);
-
-			System.out.println("Starting receiving messages");
+			ServerSocket receivingSocket = new ServerSocket(serverPort);
+			//byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
 			while(true) {
-				socket.receive(msgReceived);
-				String msgRcvText = new String(data, 0, msgReceived.getLength());
+				Socket connectionSocket = receivingSocket.accept();
+				InputStreamReader istreamReader = new InputStreamReader(connectionSocket.getInputStream());
+				BufferedReader reader = new BufferedReader(istreamReader);
+				
+				String msgRcvText = reader.readLine();
 
 				//Prepare the response
-				InetAddress clientAddress = msgReceived.getAddress();
-				int clientPort = msgReceived.getPort();
-				DatagramPacket msgToSend = new DatagramPacket(data, data.length, clientAddress, clientPort);
 				String response = "";
 
 				String splittedMsg[] = msgRcvText.split(" ");
@@ -94,8 +66,10 @@ public class Server {
 				else {
 					continue;	// Ignore malformed messages
 				}
-				msgToSend.setData(response.getBytes());
-				socket.send(msgToSend);
+				
+				OutputStream ostream = connectionSocket.getOutputStream();
+				PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
+				prtWriter.print(response);
 				System.out.println(msgRcvText + " : " + response);
 			}
 		} catch (IOException e) {
@@ -104,37 +78,23 @@ public class Server {
 	}
 
 	public static void main(String[] args) {
-		if(args.length != 3) {
-			System.out.println("Usage: java Server <srvc_port> <mcast_addr> <mcast_port>");
+		if(args.length != 1) {
+			System.out.println("Usage: java Server <srvc_port>");
 			return;
 		}
 
-		try {
-			int servicePort = Integer.parseInt(args[0]);
-			InetAddress multicastAddress = InetAddress.getByName(args[1]);
-			int multicastPort = Integer.parseInt(args[2]);
-			
-			Timer timerAdv = new Timer("advertiser");
-			Timer timerReq = new Timer("requestProcessor");
+		int servicePort = Integer.parseInt(args[0]);
+		
+		Timer timerReq = new Timer("requestProcessor");
 
-			TimerTask t1 = new TimerTask() {
-				@Override
-				public void run() {
-					advertiser(servicePort, multicastAddress, multicastPort);
-				}
-			};
-			TimerTask t2 = new TimerTask() {
-				@Override
-				public void run() {
-					requestsProcessor(servicePort);
-				}
-			};
-			
-			timerAdv.schedule(t1, 0);
-			timerReq.schedule(t2, 0);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		TimerTask t2 = new TimerTask() {
+			@Override
+			public void run() {
+				requestsProcessor(servicePort);
+			}
+		};
+		
+		timerReq.schedule(t2, 0);
 	}
 
 }
