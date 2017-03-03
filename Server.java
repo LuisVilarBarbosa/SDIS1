@@ -12,21 +12,19 @@ import java.util.TimerTask;
 
 public class Server {
 
-	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
-	
 	private static void requestsProcessor(int serverPort) {
 		ArrayList<Plate> plateList = new ArrayList<>();
 
 		try {
 			ServerSocket receivingSocket = new ServerSocket(serverPort);
-			//byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
 
 			while(true) {
 				Socket connectionSocket = receivingSocket.accept();
+				connectionSocket.setSoTimeout(3000); //3 sec
 				InputStreamReader istreamReader = new InputStreamReader(connectionSocket.getInputStream());
 				BufferedReader reader = new BufferedReader(istreamReader);
-				
 				String msgRcvText = reader.readLine();
+				System.out.println("Socket read");
 
 				//Prepare the response
 				String response = "";
@@ -66,12 +64,18 @@ public class Server {
 				else {
 					continue;	// Ignore malformed messages
 				}
-				
+
 				OutputStream ostream = connectionSocket.getOutputStream();
 				PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
 				prtWriter.print(response);
+				System.out.println("Socket wrote");
+				istreamReader.close();
+				ostream.close();
+				connectionSocket.close();
 				System.out.println(msgRcvText + " : " + response);
 			}
+		} catch (SocketException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
