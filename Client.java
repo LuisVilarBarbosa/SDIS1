@@ -40,13 +40,11 @@ public class Client {
 			OutputStream ostream = serverConnectionSocket.getOutputStream();
 			PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
 			prtWriter.println(sb.toString());
-			System.out.println("Socket wrote");
 
 			InputStreamReader istreamReader = new InputStreamReader(serverConnectionSocket.getInputStream());
 			BufferedReader reader = new BufferedReader(istreamReader);
 			String msgRcvText = reader.readLine();
 			response.append(msgRcvText);
-			System.out.println("Socket read");
 
 			ostream.close();
 			istreamReader.close();

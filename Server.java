@@ -24,7 +24,6 @@ public class Server {
 				InputStreamReader istreamReader = new InputStreamReader(connectionSocket.getInputStream());
 				BufferedReader reader = new BufferedReader(istreamReader);
 				String msgRcvText = reader.readLine();
-				System.out.println("Socket read");
 
 				//Prepare the response
 				String response = "";
@@ -68,7 +67,7 @@ public class Server {
 				OutputStream ostream = connectionSocket.getOutputStream();
 				PrintWriter prtWriter = new PrintWriter(ostream, true); //True for flushing the buffer
 				prtWriter.println(response);
-				System.out.println("Socket wrote");
+
 				istreamReader.close();
 				ostream.close();
 				connectionSocket.close();
