@@ -2,14 +2,14 @@ package SDIS;
 
 import java.io.IOException;
 import java.net.*;
+import java.rmi.Remote;
+import java.rmi.registry.Registry;
 
 public class Client {
 
-	public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
-
 	public static void main(String[] args) {
 		if(args.length != 4 && args.length != 5) {
-			System.out.println("Usage: java Client <mcast_addr> <mcast_port> <oper> <platenumber> [ownername]");
+			System.out.println("Usage: java Client <host_name> <remote_object_name> <oper> <platenumber> [ownername]");
 			return;
 		}
 
@@ -21,8 +21,8 @@ public class Client {
 			return;
 		}
 
-		String groupAddress = args[0];
-		int groupPort = Integer.parseInt(args[1]);
+		String hostName = args[0];
+		String remoteObjName = args[1];
 
 		// Build majority of output response
 		StringBuilder response = new StringBuilder();
@@ -31,47 +31,11 @@ public class Client {
 		response.append(": ");
 
 		try {
-			MulticastSocket socket = new MulticastSocket(groupPort);
-			socket.joinGroup(InetAddress.getByName(groupAddress));
-			socket.setSoTimeout(3000); //3 sec
-			socket.setTimeToLive(1);
-			byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
-			DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
-			socket.receive(mcastReceive);
-			String msgMulticastReceived = new String(data, 0, mcastReceive.getLength());
-			System.out.println(msgMulticastReceived);
-			socket.close();
-			
-			
-			//String treatment
-			String[] filter = msgMulticastReceived.split(":"); //remove "multicast:"
-			String addressAndPort = filter[1];
-			filter = addressAndPort.split(" "); //Separate Address from Port
-			
-			
-			DatagramSocket serverConnectionSocket = new DatagramSocket();
-			serverConnectionSocket.setSoTimeout(3000); //3 sec
-			InetAddress serverAddress = InetAddress.getByName(filter[0]);
-			int serverPort = Integer.parseInt(filter[1]);
-			
-			//Construct message
-			DatagramPacket msgToSend = new DatagramPacket(data, data.length, serverAddress, serverPort);
-			StringBuilder sb = new StringBuilder(args[2]);
-			for(int i = 3; i < args.length; i++)
-				sb.append(" ").append(args[i]);
-			msgToSend.setData(sb.toString().getBytes());
-			
-			serverConnectionSocket.send(msgToSend);
-			
-			DatagramPacket msgReceived = new DatagramPacket(data, data.length, serverAddress, serverPort);
-			serverConnectionSocket.receive(msgReceived);
-			String msgRcvText = new String(msgReceived.getData(), 0, msgReceived.getLength());
-			response.append(msgRcvText);
-			
-			serverConnectionSocket.close();
+			Registry r = java.rmi.registry.LocateRegistry.getRegistry();
+			Remote serverObj= r.lookup(remoteObjName);
+			((ServerObject)serverObj).lookup(plateNumber); //TODO
 		} catch (SocketTimeoutException e) {
 			response.append("ERROR");
-			System.out.println("Timeout");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
