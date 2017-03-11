@@ -20,9 +20,9 @@ public class Server {
 			ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
 			Registry r = LocateRegistry.getRegistry();
 			r.rebind(remoteObjName, (Remote) serverRMI);
-			while(true);
 		} catch (RemoteException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 

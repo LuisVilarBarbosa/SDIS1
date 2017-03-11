@@ -1,12 +1,13 @@
 package SDIS;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class ServerObject implements ServerRMI {
 	
 	private ArrayList<Plate> plateList = new ArrayList<>();
 	
-	public String register(String plateNumber, String ownerName) {
+	public String register(String plateNumber, String ownerName) throws RemoteException {
 		String response;
 		Plate p = new Plate(plateNumber, ownerName);
 		if(plateList.contains(p)) {
@@ -27,7 +28,7 @@ public class ServerObject implements ServerRMI {
 		return response;
 	}
 
-	public String lookup(String plateNumber) {
+	public String lookup(String plateNumber) throws RemoteException {
 		String response = "NOT_FOUND";
 		for(Plate p : plateList) {
 			if(p.getPlateNumber().equals(plateNumber))
