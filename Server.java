@@ -18,7 +18,7 @@ public class Server {
 			String remoteObjName = args[0];
 			ServerObject serverObj = new ServerObject();
 			ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
-			Registry r = LocateRegistry.getRegistry();
+			Registry r = LocateRegistry.createRegistry(1099);	// default port
 			r.rebind(remoteObjName, (Remote) serverRMI);
 		} catch (RemoteException e) {
 			e.printStackTrace();
