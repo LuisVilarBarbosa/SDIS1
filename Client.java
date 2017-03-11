@@ -41,9 +41,9 @@ public class Client {
 			ServerRMI serverRMI = (ServerRMI) r.lookup(remoteObjName);
 
 			if(oper.equals("register"))
-				serverRMI.register(plateNumber, ownerName);
+				response.append(serverRMI.register(plateNumber, ownerName));
 			else if (oper.equals("lookup"))
-				serverRMI.lookup(plateNumber);
+				response.append(serverRMI.lookup(plateNumber));
 			else
 				response.append("ERROR");
 		} catch (AccessException e) {
@@ -52,9 +52,11 @@ public class Client {
 		} catch (RemoteException e) {
 			response.append("ERROR");
 			e.printStackTrace();
+			System.err.println("Verify if the hostname is correct.");
 		} catch (NotBoundException e) {
 			response.append("ERROR");
 			e.printStackTrace();
+			System.err.println("Verify if the remote object name is correct.");
 		}
 
 		System.out.println(response);
