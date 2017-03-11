@@ -2,13 +2,13 @@ package SDIS;
 
 import java.util.ArrayList;
 
-public class ServerObject {
+public class ServerObject implements ServerRMI {
 	
 	private ArrayList<Plate> plateList = new ArrayList<>();
 	
-	public String register(String ownerName, String plateNumber) {
+	public String register(String plateNumber, String ownerName) {
 		String response;
-		Plate p = new Plate(plateNumber, ownerName.toString());
+		Plate p = new Plate(plateNumber, ownerName);
 		if(plateList.contains(p)) {
 			response = "-1 \nALREADY EXISTS";
 		}
@@ -19,7 +19,11 @@ public class ServerObject {
 			plateList.add(p);
 			response = Integer.toString(plateList.size());
 		}
-		System.out.println(response);
+
+		StringBuilder sb = new StringBuilder("register ");
+		sb.append(plateNumber).append(" ").append(ownerName).append(" : ").append(response);
+		System.out.println(sb);
+
 		return response;
 	}
 
@@ -29,7 +33,11 @@ public class ServerObject {
 			if(p.getPlateNumber().equals(plateNumber))
 				response = p.getOwnerName();
 		}
-		System.out.println(response);
+
+		StringBuilder sb = new StringBuilder("lookup ");
+		sb.append(plateNumber).append(" : ").append(response);
+		System.out.println(sb);
+
 		return response;
 	}
 }

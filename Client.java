@@ -1,8 +1,10 @@
 package SDIS;
 
-import java.io.IOException;
-import java.net.*;
+import java.rmi.AccessException;
+import java.rmi.NotBoundException;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class Client {
@@ -23,6 +25,10 @@ public class Client {
 
 		String hostName = args[0];
 		String remoteObjName = args[1];
+		String plateNumber = args[3];
+		String ownerName = null;
+		if(args.length >= 5)
+			ownerName = args[4];
 
 		// Build majority of output response
 		StringBuilder response = new StringBuilder();
@@ -31,14 +37,23 @@ public class Client {
 		response.append(": ");
 
 		try {
-			Registry r = java.rmi.registry.LocateRegistry.getRegistry();
-			Remote serverObj= r.lookup(remoteObjName);
-			((ServerObject)serverObj).lookup(plateNumber); //TODO
-		} catch (SocketTimeoutException e) {
+			Registry r = LocateRegistry.getRegistry(hostName);
+			ServerRMI serverRMI = (ServerRMI) r.lookup(remoteObjName);
+
+			if(oper.equals("register"))
+				serverRMI.register(plateNumber, ownerName);
+			else if (oper.equals("lookup"))
+				serverRMI.lookup(plateNumber);
+			else
+				response.append("ERROR");
+		} catch (AccessException e) {
 			response.append("ERROR");
-		} catch (SocketException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (RemoteException e) {
+			response.append("ERROR");
+			e.printStackTrace();
+		} catch (NotBoundException e) {
+			response.append("ERROR");
 			e.printStackTrace();
 		}
 

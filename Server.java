@@ -2,6 +2,7 @@ package SDIS;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -16,9 +17,9 @@ public class Server {
 		try {
 			String remoteObjName = args[0];
 			ServerObject serverObj = new ServerObject();
-			UnicastRemoteObject.exportObject((Remote) serverObj, 0);
-			Registry r = java.rmi.registry.LocateRegistry.getRegistry();
-			r.rebind(remoteObjName, (Remote) serverObj);
+			ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
+			Registry r = LocateRegistry.getRegistry();
+			r.rebind(remoteObjName, (Remote) serverRMI);
 			while(true);
 		} catch (RemoteException e) {
 			e.printStackTrace();
