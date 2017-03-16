@@ -3,11 +3,12 @@ import java.util.regex.Pattern;
 
 public class Message {
     String messageType;
-    String version;
-    String senderId;
-    String fileId;
-    String chunkNo;
-    String replicationDeg;
+    String version; // <n>.<m> -> 3 characters
+    String senderId;    // Not negative integer
+    String fileId;  // SHA256 ASCII string
+    String chunkNo; // Not negative integer not larger than 6 chars
+    String replicationDeg;  // Number in [1,9]
+    // byte[] body; // the body of the message -> to implement
 
     Message(String message) {
         Pattern p = Pattern.compile("^\\s*(\\w+)\\s+(\\d.\\d)\\s+(\\d+)\\s+(\\w{64})\\s+(\\d{1,6})\\s+(\\d+)\\s*$");   // implement "\r\n\r\n" verification
