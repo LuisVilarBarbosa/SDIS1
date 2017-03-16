@@ -52,13 +52,4 @@ public class Message {
     public String getReplicationDeg() {
         return replicationDeg;
     }
-
-    public static void main(String args[]) {
-        try {
-            Message m = new Message("  sgr   1.0   123   a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3   123   4   ");
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
