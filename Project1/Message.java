@@ -10,7 +10,7 @@ public class Message {
     String replicationDeg;
 
     Message(String message) {
-        Pattern p = Pattern.compile("\\s*(\\w+)\\s+(\\d+.\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*");   // implement "\r\n\r\n" verification
+        Pattern p = Pattern.compile("^\\s*(\\w+)\\s+(\\d.\\d)\\s+(\\d+)\\s+(\\w{64})\\s+(\\d{1,6})\\s+(\\d+)\\s*$");   // implement "\r\n\r\n" verification
         Matcher m = p.matcher(message);
 
         if(!m.matches())
@@ -23,10 +23,9 @@ public class Message {
         chunkNo = m.group(5);
         replicationDeg = m.group(6);
 
-        if(Integer.getInteger(senderId) < 0) throw new IllegalArgumentException("Invalid senderId (must be not negative).");
-        if(Integer.getInteger(fileId) < 0) throw new IllegalArgumentException("Invalid fileId (must be not negative).");
-        if(Integer.getInteger(chunkNo) < 0) throw new IllegalArgumentException("Invalid chunkNo (must be not negative).");
-        int repDeg = Integer.getInteger(replicationDeg);
+        if(Integer.parseInt(senderId) < 0) throw new IllegalArgumentException("Invalid senderId (must be not negative).");
+        if(Integer.parseInt(chunkNo) < 0) throw new IllegalArgumentException("Invalid chunkNo (must be not negative).");
+        int repDeg = Integer.parseInt(replicationDeg);
         if(repDeg < 1 || repDeg > 9) throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
     }
 
@@ -52,5 +51,14 @@ public class Message {
 
     public String getReplicationDeg() {
         return replicationDeg;
+    }
+
+    public static void main(String args[]) {
+        try {
+            Message m = new Message("  sgr   1.0   123   a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3   123   4   ");
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }
