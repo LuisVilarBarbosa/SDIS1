@@ -6,6 +6,23 @@ import java.util.TimerTask;
 public class Dispatcher {
 
     public static void main(String args[]) {
+        if(args.length != 9) {
+            System.out.println("Usage: Dispatcher <protocol_version> <serverId> <srvc_access_point> " +
+                    "<mcast_control_ip> <mcast_control_port> <mcast_data_backup_ip> <mcast_data_backup_port> " +
+                    "<mcast_data_restore_ip> <mcast_data_restore_port>");
+            return;
+        }
+
+        String protocolVersion = args[0];
+        int serverId = Integer.parseInt(args[1]);
+        String accessPoint = args[2];
+        String mControlIp = args[3];
+        int mControlPort = Integer.parseInt(args[4]);
+        String mDataBackupIp = args[5];
+        int mDataBackupPort = Integer.parseInt(args[6]);
+        String mDataRestoreIp = args[7];
+        int mDataRestorePort = Integer.parseInt(args[8]);
+
         String command = "";
         Scanner scanner = new Scanner(System.in);
         ArrayList<Timer> timers = new ArrayList<>();
