@@ -1,6 +1,8 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/* Generic message: <MessageType> <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> */
+
 public class Message {
     String messageType;
     String version; // <n>.<m> -> 3 characters
