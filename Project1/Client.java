@@ -1,3 +1,5 @@
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -7,16 +9,18 @@ import java.util.StringTokenizer;
 public class Client {
 
     public static void main(String args[]) {
-        if (args.length != 3 && args.length != 4) {
+        if (args.length < 3 || args.length > 4) {
             System.out.println("Client <peer_ap> <sub_protocol> <opnd_1> [<opnd_2>]");
             return;
         }
 
         String peerAccessPoint = args[0];
         String subProtocol = args[1];
-        String opnd1 = args[2];
+        String opnd1 = null;
+        if (args.length >= 3)
+            opnd1 = args[2];
         String opnd2 = null;
-        if (args.length == 4)
+        if (args.length >= 4)
             opnd2 = args[3];
 
         StringTokenizer st = new StringTokenizer(peerAccessPoint, ":");
@@ -34,12 +38,46 @@ public class Client {
             Registry r = LocateRegistry.getRegistry(peerHostName);
             ServerRMI serverRMI = (ServerRMI) r.lookup(peerRemoteObjName);
 
-            if (args[1].equalsIgnoreCase("RESTORE"))
-                serverRMI.restore(opnd1);   /* opnd1 = filename */
+            if (subProtocol.equalsIgnoreCase("BACKUP"))
+                fileBackup(serverRMI, opnd1, opnd2);
+            else if (subProtocol.equalsIgnoreCase("RESTORE"))
+                fileRestore(serverRMI, opnd1);
+            else if (subProtocol.equalsIgnoreCase("DELETE"))
+                fileDeletion(serverRMI, opnd1);
+            else if (subProtocol.equalsIgnoreCase("RECLAIM"))
+                manageServerStorage(serverRMI, opnd1);
+            else if (subProtocol.equalsIgnoreCase("STATE"))
+                retrieveState(serverRMI);
+
         } catch (RemoteException e) {
             System.err.println(e.getMessage());
         } catch (NotBoundException e) {
             System.err.println(e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private static void fileBackup(ServerRMI serverRMI, String filename, String replicationDegree) {
+        // get file modification date
+    }
+
+    private static void fileRestore(ServerRMI serverRMI, String filename) throws IOException {
+        byte[] fileData = serverRMI.restore(filename);
+        FileOutputStream fileOutputStream = new FileOutputStream(filename);
+        fileOutputStream.write(fileData);
+        fileOutputStream.close();
+    }
+
+    private static void fileDeletion(ServerRMI serverRMI, String filename) {
+
+    }
+
+    private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) {
+
+    }
+
+    private static void retrieveState(ServerRMI serverRMI) {
+
     }
 }
