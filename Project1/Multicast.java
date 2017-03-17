@@ -8,6 +8,8 @@ public class Multicast {
 
     public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
     private MulticastSocket socket;
+    private String multicastAddress;
+    private int multicastPort;
 
     public Multicast() {
         try {
@@ -18,18 +20,21 @@ public class Multicast {
         }
     }
 
-    public Multicast(String groupAddress, int groupPort) {
+    public Multicast(String groupAddress, int groupPort, boolean timeout) {
         try {
             socket = new MulticastSocket(groupPort);
             socket.joinGroup(InetAddress.getByName(groupAddress));
-            socket.setSoTimeout(3000); //3 sec
+            if(timeout)
+                socket.setSoTimeout(400);
             socket.setTimeToLive(1);    //To avoid network congestion
+            multicastAddress = groupAddress;
+            multicastPort = groupPort;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void send(String multicastAddress, int multicastPort, byte[] message) {
+    public void send(byte[] message) {
         try {
             if (message.length > UDP_DATAGRAM_MAX_LENGTH)
                 throw new IllegalArgumentException("Message too big.");
