@@ -29,7 +29,7 @@ public class Multicast {
         }
     }
 
-    private void send(String multicastAddress, int multicastPort, byte[] message) {
+    public void send(String multicastAddress, int multicastPort, byte[] message) {
         try {
             if (message.length > UDP_DATAGRAM_MAX_LENGTH)
                 throw new IllegalArgumentException("Message too big.");
@@ -41,7 +41,7 @@ public class Multicast {
         }
     }
 
-    private byte[] receive() {
+    public byte[] receive() {
         byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
         try {
             DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
@@ -53,7 +53,7 @@ public class Multicast {
         return data;
     }
 
-    private void close() {
+    public void close() {
         socket.close();
     }
 }

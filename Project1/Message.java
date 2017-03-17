@@ -12,7 +12,7 @@ public class Message {
     String replicationDeg;  // Number in [1,9]
     // byte[] body; // the body of the message -> to implement
 
-    Message(String message) {
+    public Message(String message) {
         Pattern p = Pattern.compile("^\\s*(\\w+)\\s+(\\d.\\d)\\s+(\\d+)\\s+(\\w{64})\\s+(\\d{1,6})\\s+(\\d+)\\s*$");   // implement "\r\n\r\n" verification
         Matcher m = p.matcher(message);
 
