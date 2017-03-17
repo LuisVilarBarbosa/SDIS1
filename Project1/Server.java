@@ -3,7 +3,7 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Dispatcher {
+public class Server {
 
     public static void main(String args[]) {
         if(args.length != 9) {
