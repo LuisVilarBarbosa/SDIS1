@@ -32,6 +32,10 @@ public class Message {
         if(repDeg < 1 || repDeg > 9) throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
     }
 
+    public Message(byte[] message) {
+        this(new String(message));
+    }
+
     public String getMessageType() {
         return messageType;
     }
