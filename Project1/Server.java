@@ -1,15 +1,19 @@
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class Server {
 
     public static void main(String args[]) {
-        if(args.length != 9) {
-            System.out.println("Usage: Dispatcher <protocol_version> <serverId> <srvc_access_point> " +
+        if (args.length != 9) {
+            System.out.println("Usage: Server <protocol_version> <serverId> <srvc_access_point> " +
                     "<mcast_control_ip> <mcast_control_port> <mcast_data_backup_ip> <mcast_data_backup_port> " +
-                    "<mcast_data_restore_ip> <mcast_data_restore_port>");
+                    "<mcast_data_recovery_ip> <mcast_data_recovery_port>");
             return;
         }
 
@@ -20,35 +24,42 @@ public class Server {
         int mControlPort = Integer.parseInt(args[4]);
         String mDataBackupIp = args[5];
         int mDataBackupPort = Integer.parseInt(args[6]);
-        String mDataRestoreIp = args[7];
-        int mDataRestorePort = Integer.parseInt(args[8]);
+        String mDataRecoveryIp = args[7];
+        int mDataRecoveryPort = Integer.parseInt(args[8]);
 
-        String command = "";
-        Scanner scanner = new Scanner(System.in);
-        ArrayList<Timer> timers = new ArrayList<>();
+        Multicast mControlCh = new Multicast(mControlIp, mControlPort, false);
+        Multicast mDataBackupCh = new Multicast(mDataBackupIp, mDataBackupPort, true);
+        Multicast mDataRecoveryCh = new Multicast(mDataRecoveryIp, mDataRecoveryPort, true);
 
-        do {
-            command = scanner.nextLine();
+        StringTokenizer st = new StringTokenizer(accessPoint, ":");
+        String hostName = null;
+        String remoteObjName;
+        if (st.countTokens() == 1)
+            remoteObjName = st.nextToken();
+        else if (st.countTokens() == 2) {
+            hostName = st.nextToken();
+            remoteObjName = st.nextToken();
+        } else
+            throw new IllegalArgumentException("Invalid access point.");
 
-            Timer timer = new Timer();
-            String finalCommand = command;
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        System.out.println(finalCommand);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            timer.schedule(timerTask, 0);
-            timers.add(timer);
-        } while(!command.equalsIgnoreCase("exit"));
+        ServerDatabase db = new ServerDatabase();
 
-        scanner.close();
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                ServerChunkRestore.chunkProvider(serverId, mControlCh, mDataRecoveryCh);
+            }
+        };
+        timer.schedule(timerTask, 0);
 
-        for(int i = 0; i < timers.size(); i++)
-            timers.get(i).cancel();
+        try {
+            ServerObject serverObj = new ServerObject(serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
+            ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
+            Registry r = LocateRegistry.createRegistry(1099);   // default port
+            r.rebind(remoteObjName, (Remote) serverRMI);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }
