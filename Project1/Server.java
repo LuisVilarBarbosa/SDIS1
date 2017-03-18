@@ -48,7 +48,7 @@ public class Server {
         TimerTask timerTask1 = new TimerTask() {
             @Override
             public void run() {
-                ServerChunkRestore.chunkProvider(serverId, mControlCh, mDataRecoveryCh);
+                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh);
             }
         };
         timer1.schedule(timerTask1, 0);
@@ -57,13 +57,13 @@ public class Server {
         TimerTask timerTask2 = new TimerTask() {
             @Override
             public void run() {
-                ServerFileDeletion.fileChunksDeleter(serverId, mControlCh);
+                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh);
             }
         };
         timer2.schedule(timerTask2, 0);
 
         try {
-            ServerObject serverObj = new ServerObject(serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
+            ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
             Registry r = LocateRegistry.createRegistry(1099);   // default port
             r.rebind(remoteObjName, (Remote) serverRMI);

@@ -9,9 +9,9 @@ import java.io.IOException;
 public class ServerChunkRestore {
     public static int chunkSize = 64000;
 
-    public static byte[] requestChunk(int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String fileId, int chunkNo) {
-        StringBuilder st = new StringBuilder("GETCHUNK 1.0 ");
-        st.append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
+    public static byte[] requestChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String fileId, int chunkNo) {
+        StringBuilder st = new StringBuilder("GETCHUNK ");
+        st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());
 
         //Message m = mDataRecoveryCh.receive();
@@ -19,7 +19,7 @@ public class ServerChunkRestore {
         return new byte[0];
     }
 
-    public static void chunkProvider(int serverId, Multicast mControlCh, Multicast mDataRecoveryCh) {
+    public static void chunkProvider(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh) {
         byte[] data = new byte[chunkSize];
         while (true) {
             try {
@@ -32,7 +32,7 @@ public class ServerChunkRestore {
                 if (m2.getMessageType().equalsIgnoreCase("CHUNK"))
                     continue;
 
-                if (m.getMessageType().equalsIgnoreCase("GETCHUNK")) {
+                if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
                     String fileId = m.getFileId();
                     String chunkNo = m.getChunkNo();
 
@@ -42,8 +42,8 @@ public class ServerChunkRestore {
                     file.read(data);
                     file.close();
 
-                    StringBuilder headerToSend = new StringBuilder("CHUNK 1.0 ");
-                    headerToSend.append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
+                    StringBuilder headerToSend = new StringBuilder("CHUNK ");
+                    headerToSend.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
 
                     ByteArrayOutputStream msg = new ByteArrayOutputStream();
                     msg.write(headerToSend.toString().getBytes());

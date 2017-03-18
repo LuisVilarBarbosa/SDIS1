@@ -1,14 +1,17 @@
 import java.rmi.RemoteException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 public class ServerObject implements ServerRMI {
+    private String protocolVersion;
     private int serverId;
     private Multicast mControlCh;
     private Multicast mDataBackupCh;
     private Multicast mDataRecoveryCh;
     private ServerDatabase db;
 
-    public ServerObject(int serverId, Multicast mControlCh, Multicast mDataBackupCh, Multicast mDataRecoveryCh, ServerDatabase db) {
+    public ServerObject(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh, Multicast mDataRecoveryCh, ServerDatabase db) {
+        this.protocolVersion = protocolVersion;
         this.serverId = serverId;
         this.mControlCh = mControlCh;
         this.mDataBackupCh = mDataBackupCh;
@@ -23,13 +26,13 @@ public class ServerObject implements ServerRMI {
     public byte[] restore(String filename) throws RemoteException {
         // Concurrency is missing
         String fileId = calculateFileId(filename);
-        return ServerFileRestore.restore(serverId, mControlCh, mDataRecoveryCh, fileId);
+        return ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, fileId);
     }
 
     public void delete(String filename) throws RemoteException {
         // Concurrency is missing
         String fileId = calculateFileId(filename);
-        ServerFileDeletion.requestDeletion(serverId, mControlCh, fileId);
+        ServerFileDeletion.requestDeletion(protocolVersion, serverId, mControlCh, fileId);
     }
 
     private String calculateFileId(String filename) {
@@ -37,7 +40,7 @@ public class ServerObject implements ServerRMI {
         try {
             ArrayList<String> dates = db.getDates(filename);
             fileId = SHA256.SHA256(filename + dates.get(dates.size() - 1));
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
         return fileId;

@@ -5,19 +5,19 @@ import java.io.*;
 public class ServerFileDeletion {
     public static final int chunkSize = 64000;
 
-    public static void requestDeletion(int serverId, Multicast mControlCh, String fileId) {
-        StringBuilder st = new StringBuilder("DELETE 1.0 ");
-        st.append(serverId).append(" ").append(fileId).append("\r\n\r\n");
+    public static void requestDeletion(String protocolVersion, int serverId, Multicast mControlCh, String fileId) {
+        StringBuilder st = new StringBuilder("DELETE ");
+        st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());
     }
 
-    public static void fileChunksDeleter(int serverId, Multicast mControlCh) {
+    public static void fileChunksDeleter(String protocolVersion, int serverId, Multicast mControlCh) {
         byte[] data = new byte[chunkSize];
         while (true) {
                 byte[] request = mControlCh.receive();
                 Message m = new Message(request);
 
-                if (m.getMessageType().equalsIgnoreCase("DELETE")) {
+                if (m.getMessageType().equalsIgnoreCase("DELETE") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
                     String fileId = m.getFileId();
 
                     StringBuilder path = new StringBuilder(serverId);
