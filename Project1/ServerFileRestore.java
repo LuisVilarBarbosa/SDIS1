@@ -1,15 +1,12 @@
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 
 public class ServerFileRestore {
 
-    public static byte[] restore(int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, ServerDatabase db, String filename) {
+    public static byte[] restore(int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String fileId) {
         ByteArrayOutputStream file = new ByteArrayOutputStream();
         try {
-            ArrayList<String> dates = db.getDates(filename);
-            String fileId = SHA256.SHA256(filename + dates.get(dates.size() - 1));
             byte[] data;
             int chunkNo = 1;
 

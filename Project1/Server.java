@@ -42,16 +42,25 @@ public class Server {
         } else
             throw new IllegalArgumentException("Invalid access point.");
 
-        ServerDatabase db = new ServerDatabase();
+        ServerDatabase db = new ServerDatabase(serverId);
 
-        Timer timer = new Timer();
-        TimerTask timerTask = new TimerTask() {
+        Timer timer1 = new Timer();
+        TimerTask timerTask1 = new TimerTask() {
             @Override
             public void run() {
                 ServerChunkRestore.chunkProvider(serverId, mControlCh, mDataRecoveryCh);
             }
         };
-        timer.schedule(timerTask, 0);
+        timer1.schedule(timerTask1, 0);
+
+        Timer timer2 = new Timer();
+        TimerTask timerTask2 = new TimerTask() {
+            @Override
+            public void run() {
+                ServerFileDeletion.fileChunksDeleter(serverId, mControlCh);
+            }
+        };
+        timer2.schedule(timerTask2, 0);
 
         try {
             ServerObject serverObj = new ServerObject(serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);

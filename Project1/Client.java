@@ -69,8 +69,8 @@ public class Client {
         fileOutputStream.close();
     }
 
-    private static void fileDeletion(ServerRMI serverRMI, String filename) {
-
+    private static void fileDeletion(ServerRMI serverRMI, String filename) throws RemoteException {
+        serverRMI.delete(filename);
     }
 
     private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) {

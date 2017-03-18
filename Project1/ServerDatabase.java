@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class ServerDatabase {
-    private static final String dbFilename = "database.txt";
+    private final String dbPath;
     private static final String delim = "|";
     HashMap<String, ArrayList<String>> db = new HashMap<>();
 
-    public ServerDatabase() {
+    public ServerDatabase(int serverId) {
+        dbPath = serverId + "/database.txt";
         try {
-            FileInputStream fis = new FileInputStream(dbFilename);
+            FileInputStream fis = new FileInputStream(dbPath);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader file = new BufferedReader(isr);
             String line;
@@ -28,6 +29,8 @@ public class ServerDatabase {
             fis.close();
         } catch (FileNotFoundException e) {
             System.out.println("Building new database.");
+            File file = new File(dbPath);
+            file.mkdirs();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,7 +40,7 @@ public class ServerDatabase {
             @Override
             public void run() {
                 try {
-                    FileOutputStream fos = new FileOutputStream(dbFilename);
+                    FileOutputStream fos = new FileOutputStream(dbPath);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
                     for (HashMap.Entry<String, ArrayList<String>> entry : db.entrySet()) {
                         ArrayList<String> dates = entry.getValue();
