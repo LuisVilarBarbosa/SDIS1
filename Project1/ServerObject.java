@@ -19,7 +19,7 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
-    public void backup(String filename, String lastModifiedDate, byte[] data) throws RemoteException {
+    public void backup(String filename, byte[] data) throws RemoteException {
 
     }
 

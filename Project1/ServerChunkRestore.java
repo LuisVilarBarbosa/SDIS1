@@ -23,16 +23,16 @@ public class ServerChunkRestore {
         byte[] data = new byte[chunkSize];
         while (true) {
             try {
-                byte[] request1 = mControlCh.receive();
+                byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
 
-                byte[] request2 = mControlCh.receive();
+                byte[] request2 = mDataRecoveryCh.receive(); //Notification that other server has attended the request first
                 Message m2 = new Message(request2);
 
-                if (m2.getMessageType().equalsIgnoreCase("CHUNK"))
+                if (m2.getMessageType().equalsIgnoreCase("CHUNK")) //If the other server attended the same request
                     continue;
 
-                if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
+                if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) { //Else, this server attends the request
                     String fileId = m.getFileId();
                     String chunkNo = m.getChunkNo();
 

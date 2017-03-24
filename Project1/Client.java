@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -58,8 +61,17 @@ public class Client {
         }
     }
 
-    private static void fileBackup(ServerRMI serverRMI, String filename, String replicationDegree) {
-        // get file modification date
+    private static void fileBackup(ServerRMI serverRMI, String filename, String replicationDegree) throws IOException {
+    	FileInputStream fileInputStream = new FileInputStream(filename);
+    	File file = new File(filename);
+    	
+    	
+    	long fileSize = file.length();
+    	
+    	byte[] fileData = new byte[fileSize];
+    	fileInputStream.read(fileData);
+    	serverRMI.backup(filename, fileData);
+    	fileInputStream.close();
     }
 
     private static void fileRestore(ServerRMI serverRMI, String filename) throws IOException {

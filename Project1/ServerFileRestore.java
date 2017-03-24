@@ -8,11 +8,12 @@ public class ServerFileRestore {
         ByteArrayOutputStream file = new ByteArrayOutputStream();
         try {
             byte[] data;
-            int chunkNo = 1;
+            int chunkNo = 0;
 
             do {
                 data = ServerChunkRestore.requestChunk(protocolVersion, serverId, mControlCh, mDataRecoveryCh, fileId, chunkNo);
-                file.write(data);
+                file.write(data); //TODO Está a acumular o ficheiro todo na stream. Modificar para mudar logo
+                chunkNo++;
             } while (data.length == ServerChunkRestore.chunkSize);
         } catch (IOException e) {
             e.printStackTrace();
