@@ -1,3 +1,4 @@
+import java.io.File;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -19,8 +20,11 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
-    public void backup(String filename, byte[] data) throws RemoteException {
-
+    public void backup(String filename, byte[] data, long size) throws RemoteException {
+    	//TODO criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
+    	
+    	//Add file info to database table
+    	this.db.addFileAndDate(filename, date);
     }
 
     public byte[] restore(String filename) throws RemoteException {

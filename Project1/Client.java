@@ -68,9 +68,10 @@ public class Client {
     	
     	long fileSize = file.length();
     	
-    	byte[] fileData = new byte[fileSize];
+    	
+    	byte[] fileData = new byte[(int)fileSize]; //TODO com int filesize só dá ate 4GB. Arranjar maneira de ter mais
     	fileInputStream.read(fileData);
-    	serverRMI.backup(filename, fileData);
+    	serverRMI.backup(filename, fileData, fileSize);
     	fileInputStream.close();
     }
 
