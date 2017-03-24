@@ -5,7 +5,8 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 
 public class Multicast {
-
+    public static final int timeout = 1;    /* milliseconds */
+    public static final int timeToLive = 1;
     public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
     private MulticastSocket socket;
     private String multicastAddress;
@@ -14,7 +15,7 @@ public class Multicast {
     public Multicast() {
         try {
             socket = new MulticastSocket();
-            socket.setTimeToLive(1); //To avoid network congestion
+            socket.setTimeToLive(timeToLive); //To avoid network congestion
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -24,9 +25,9 @@ public class Multicast {
         try {
             socket = new MulticastSocket(groupPort);
             socket.joinGroup(InetAddress.getByName(groupAddress));
-            if(timeout)
-                socket.setSoTimeout(400);
-            socket.setTimeToLive(1);    //To avoid network congestion
+            if (timeout)
+                socket.setSoTimeout(this.timeout);
+            socket.setTimeToLive(timeToLive);    //To avoid network congestion
             multicastAddress = groupAddress;
             multicastPort = groupPort;
         } catch (IOException e) {

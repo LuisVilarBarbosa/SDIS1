@@ -5,8 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Random;
 
 public class ServerChunkRestore {
+    private static final int maxWaitTime = 400; /* milliseconds */
     public static int chunkSize = 64000;
 
     public static byte[] requestChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String fileId, int chunkNo) {
@@ -14,9 +16,8 @@ public class ServerChunkRestore {
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());
 
-        //Message m = mDataRecoveryCh.receive();
-        //return m.getBody();
-        return new byte[0];
+        Message m = mDataRecoveryCh.receive();
+        return m.getBody();
     }
 
     public static void chunkProvider(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh) {
@@ -26,11 +27,16 @@ public class ServerChunkRestore {
                 byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
 
-                byte[] request2 = mDataRecoveryCh.receive(); //Notification that other server has attended the request first
-                Message m2 = new Message(request2);
+                //Notification that other server has attended the request first
+                byte[] request2 = null;
+                for (long waitTime = new Random().nextInt() % maxWaitTime, ini = System.currentTimeMillis(); request2 == null && System.currentTimeMillis() - ini < waitTime; )
+                    request2 = mDataRecoveryCh.receive();
 
-                if (m2.getMessageType().equalsIgnoreCase("CHUNK")) //If the other server attended the same request
-                    continue;
+                if(request2 != null) {
+                    Message m2 = new Message(request2);
+                    if (m2.getMessageType().equalsIgnoreCase("CHUNK")) //If the other server attended the same request
+                        continue;
+                }
 
                 if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) { //Else, this server attends the request
                     String fileId = m.getFileId();

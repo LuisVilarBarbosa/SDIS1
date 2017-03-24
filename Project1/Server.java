@@ -28,7 +28,7 @@ public class Server {
         int mDataRecoveryPort = Integer.parseInt(args[8]);
 
         Multicast mControlCh = new Multicast(mControlIp, mControlPort, false);
-        Multicast mDataBackupCh = new Multicast(mDataBackupIp, mDataBackupPort, true);
+        Multicast mDataBackupCh = new Multicast(mDataBackupIp, mDataBackupPort, false);
         Multicast mDataRecoveryCh = new Multicast(mDataRecoveryIp, mDataRecoveryPort, true);
 
         StringTokenizer st = new StringTokenizer(accessPoint, ":");
