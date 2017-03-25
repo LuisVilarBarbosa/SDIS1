@@ -16,7 +16,8 @@ public class ServerChunkRestore {
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());
 
-        Message m = mDataRecoveryCh.receive();
+        byte[] data = mDataRecoveryCh.receive();
+        Message m = new Message(data);
         return m.getBody();
     }
 

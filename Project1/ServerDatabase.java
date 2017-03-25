@@ -5,11 +5,12 @@ import java.util.StringTokenizer;
 
 public class ServerDatabase {
     private final String dbPath;
+    private static final String dbFilename = "database.txt";
     private static final String delim = "|";
     HashMap<String, ArrayList<String>> db = new HashMap<>();
 
     public ServerDatabase(int serverId) {
-        dbPath = serverId + "/database.txt";
+        dbPath = serverId + "/" + dbFilename;
         try {
             FileInputStream fis = new FileInputStream(dbPath);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -29,8 +30,14 @@ public class ServerDatabase {
             fis.close();
         } catch (FileNotFoundException e) {
             System.out.println("Building new database.");
+            File folder = new File(Integer.toString(serverId));
+            folder.mkdirs();
             File file = new File(dbPath);
-            file.mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
