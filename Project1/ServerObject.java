@@ -1,7 +1,10 @@
 import java.io.File;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ServerObject implements ServerRMI {
     private String protocolVersion;
@@ -20,11 +23,21 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
-    public void backup(String filename, byte[] data, long size) throws RemoteException {
+    public void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException {
     	//TODO criar uma estrutura de dados que guarde tamb√©m o tamanho dos dados, em vez de byte[] data
     	
     	//Add file info to database table
-    	this.db.addFileAndDate(filename, date);
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    	Date date = new Date(); //Actual timestamp
+    	dateFormat.format(date);
+    	
+    	this.db.addFileAndDate(filename, date.toString());
+    	String fileId = calculateFileId(filename);
+    	
+    	ServerFileBackup.backup(this,  );
+    	//Responsavel por
+    	// - Chamar o objeto que vai tratar da divis„o do ficheiro/envio
+    	// - Guardar a info do objeto na base de dados
     }
 
     public byte[] restore(String filename) throws RemoteException {
@@ -49,4 +62,7 @@ public class ServerObject implements ServerRMI {
         }
         return fileId;
     }
+    
+    public String getProtocolVersion(){ return protocolVersion; }
+    public int getServerId() { return serverId; }
 }

@@ -3,7 +3,7 @@ import java.rmi.RemoteException;
 
 public interface ServerRMI extends Remote {
 
-    void backup(String filename, byte[] data, long size) throws RemoteException;
+    void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException;
 
     byte[] restore(String filename) throws RemoteException;
 

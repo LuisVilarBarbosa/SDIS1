@@ -79,4 +79,8 @@ public class ServerDatabase {
         dates.add(date);
         db.put(filename, dates);
     }
+    
+    public void removeFileAndDate(String filename){
+    	//TODO
+    }
 }
