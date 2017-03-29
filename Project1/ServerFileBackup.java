@@ -1,23 +1,14 @@
+import java.rmi.RemoteException;
+
 import javax.naming.directory.InvalidAttributesException;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 public class ServerFileBackup {
 	
-	/**
-	 * Returns the number of chunks necessary to send the file.
-	 * The last chunk is always shorter. In case the filesize/MAX_BODY_SIZE is an integer, the last chunk
-	 * has bodySize = 0;
-	 * @param filesize
-	 * @return number of chunks
-	 */
-	private static long totalChunkNumber(long filesize) {
-		return (filesize / Message.MAX_BODY_SIZE) + 1;
-	}
-	
-	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data, long size) {
+	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data, long size) throws RemoteException {
 		//Responsavel por 
 		// - Dividir em chunks
-		// - Criar chunk no e ?Message?
+		// - Criar chunk no e Message
 		// - Chamar o ChunkBackup
 		
 		long bytesRead = 0;
@@ -45,12 +36,18 @@ public class ServerFileBackup {
 				System.arraycopy(data, (int)bytesRead, chunkBody, 0, chunkBodySize);
 			}
 			
+			chunk.setBodyData(chunkBody);
+			
 			//TODO é preciso estas 2 variaveis? Ja nao consigo pensar direito
 			bytesRead = bytesRead + chunkBodySize;
 			bytesRemaining = bytesRemaining - chunkBodySize;
 			
 			//TODO Send data to Chunk Backup
-			ServerChunkBackup.doStuff();
+			ServerChunkBackup.putChunk(serverInfo.getProtocolVersion(), 
+					serverInfo.getServerId(), 
+					serverInfo.getControlChannel(),
+					serverInfo.getDataBackupChannel(), 
+					chunk, replicationDegree);
 		}
 		
 	}

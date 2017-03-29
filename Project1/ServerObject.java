@@ -34,7 +34,7 @@ public class ServerObject implements ServerRMI {
     	this.db.addFileAndDate(filename, date.toString());
     	String fileId = calculateFileId(filename);
     	
-    	ServerFileBackup.backup(this,  );
+    	ServerFileBackup.backup(this, fileId, replicationDegree, data, size);
     	//Responsavel por
     	// - Chamar o objeto que vai tratar da divisão do ficheiro/envio
     	// - Guardar a info do objeto na base de dados
@@ -65,4 +65,7 @@ public class ServerObject implements ServerRMI {
     
     public String getProtocolVersion(){ return protocolVersion; }
     public int getServerId() { return serverId; }
+    public Multicast getControlChannel() { return mControlCh; }
+    public Multicast getDataBackupChannel() { return mDataBackupCh; }
+    public Multicast getDataRecoveryChannel() { return mDataRecoveryCh; }
 }

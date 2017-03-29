@@ -233,4 +233,12 @@ public class Message {
     	else
     		this.chunkNo = Integer.toString(chunkNumber);
     }
+    
+    public byte[] generateByteArray(){
+    	byte[] c = 	new byte[header.length + body.length];
+    	System.arraycopy(header, 0, c, 0, header.length);
+    	System.arraycopy(body, 0, c, header.length, body.length);
+    	
+    	return c;
+    }
 }

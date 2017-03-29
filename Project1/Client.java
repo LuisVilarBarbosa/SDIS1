@@ -71,7 +71,7 @@ public class Client {
     	
     	byte[] fileData = new byte[(int)fileSize]; //TODO com int filesize só dá ate 4GB. Arranjar maneira de ter mais
     	fileInputStream.read(fileData);
-    	serverRMI.backup(filename, fileData, fileSize);
+    	serverRMI.backup(filename, fileData, fileSize, Integer.parseInt(replicationDegree)); //TODO surround with try catch(RemoteException)
     	fileInputStream.close();
     }
 
