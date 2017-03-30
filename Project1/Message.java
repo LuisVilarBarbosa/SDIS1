@@ -71,9 +71,18 @@ public class Message {
     	if(data.length > this.max_body_size)
     		throw new ArrayStoreException("Invalid store: Data does not fit in the chunk body");
     	this.body = data;
-    	return data.length;
+    	
+    	if(data == null)
+    		return 0;
+    	else
+    		return data.length;
     }
     
+    public void setMessageType(MESSAGE_TYPE mt) {
+    	String type = messageTypeToString(mt);
+    	if(!type.equals("error"))
+    		messageType = type;
+    }
     
     public String getMessageType() {
         return messageType;

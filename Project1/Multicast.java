@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketException;
 import java.util.Arrays;
 
 public class Multicast {
@@ -56,6 +57,21 @@ public class Multicast {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return data;
+    }
+    
+    public byte[] receive(int blockingTime) throws SocketException{
+    	byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
+        DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
+        socket.setSoTimeout(blockingTime);
+        try {
+			socket.receive(mcastReceive);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        socket.setSoTimeout(0);
+        data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
         return data;
     }
 
