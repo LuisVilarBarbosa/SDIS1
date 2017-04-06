@@ -6,7 +6,7 @@ public class ServerDatabase {
     private static final String dbFilename = "database.txt";
     private static final String delim = "|";
     private final String dbPath;
-    private int storageSize;    // bytes
+    private long storageSize;    // bytes
     private HashMap<String, DBFileData> db = new HashMap<>();
 
     public ServerDatabase(int serverId) {
@@ -97,6 +97,18 @@ public class ServerDatabase {
 
     public void removeFile(String filePath) {
         db.remove(filePath);
+    }
+
+    public long getStorageSize() {
+        return storageSize;
+    }
+
+    public void setStorageSize(long storageSize) {
+        this.storageSize = storageSize;
+    }
+
+    public DBFileData getDBFileData(String fileId) {
+        return db.get(fileId);
     }
 
 }
