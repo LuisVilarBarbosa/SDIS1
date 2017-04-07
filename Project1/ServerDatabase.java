@@ -1,13 +1,13 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class ServerDatabase {
-    private final String dbPath;
     private static final String dbFilename = "database.txt";
     private static final String delim = "|";
-    HashMap<String, ArrayList<String>> db = new HashMap<>();
+    private final String dbPath;
+    private long storageSize;    // bytes
+    private HashMap<String, DBFileData> db = new HashMap<>();
 
     public ServerDatabase(int serverId) {
         dbPath = serverId + "/" + dbFilename;
@@ -15,15 +15,20 @@ public class ServerDatabase {
             FileInputStream fis = new FileInputStream(dbPath);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader file = new BufferedReader(isr);
-            String line;
+            String line = file.readLine();
+            storageSize = Integer.getInteger(line);
             while ((line = file.readLine()) != null) {
                 StringTokenizer st = new StringTokenizer(line, delim);
-                String filename = st.nextToken();
-                ArrayList<String> lastModificationDates = new ArrayList<>();
-                int numTokens = st.countTokens();
-                for (int i = 0; i < numTokens; i++)
-                    lastModificationDates.add(st.nextToken());
-                db.put(filename, lastModificationDates);
+                String filePath = st.nextToken();
+                String lastModificationDate = st.nextToken();
+                int chunkId = Integer.getInteger(st.nextToken());
+                int desiredReplicationDegree = Integer.getInteger(st.nextToken());
+                int detectedReplicationDegree = Integer.getInteger(st.nextToken());
+                DBFileData dbFileData;
+                if ((dbFileData = db.get(filePath)) == null)
+                    dbFileData = new DBFileData(filePath, lastModificationDate);
+                dbFileData.addFileChunkData(new FileChunkData(chunkId, desiredReplicationDegree, detectedReplicationDegree));
+                db.put(filePath, dbFileData);
             }
             file.close();
             isr.close();
@@ -49,13 +54,23 @@ public class ServerDatabase {
                 try {
                     FileOutputStream fos = new FileOutputStream(dbPath);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
-                    for (HashMap.Entry<String, ArrayList<String>> entry : db.entrySet()) {
-                        ArrayList<String> dates = entry.getValue();
-                        StringBuilder st = new StringBuilder(entry.getKey());
-                        for (int i = 0; i < dates.size(); i++)
-                            st.append(delim).append(dates.get(i));
-                        st.append("\r\n");
-                        file.write(st.toString());
+                    file.write(storageSize + "\r\n");
+                    for (HashMap.Entry<String, DBFileData> entry : db.entrySet()) {
+                        DBFileData dbFileData = entry.getValue();
+                        String filePath = dbFileData.getFilePath();
+                        String lastModificationDate = dbFileData.getLastModificationDate();
+                        int numFileChunks = dbFileData.getNumFileChunks();
+                        for (int i = 1; i <= numFileChunks; i++) {
+                            FileChunkData fileChunkData = dbFileData.getFileChunkData(i);
+                            StringBuilder st = new StringBuilder(entry.getKey());
+                            st.append(delim).append(filePath);
+                            st.append(delim).append(lastModificationDate);
+                            st.append(delim).append(fileChunkData.getChunkId());
+                            st.append(delim).append(fileChunkData.getDesiredReplicationDegree());
+                            st.append(delim).append(fileChunkData.getDetectedReplicationDegree());
+                            st.append("\r\n");
+                            file.write(st.toString());
+                        }
                     }
                     file.close();
                     fos.close();
@@ -68,19 +83,32 @@ public class ServerDatabase {
         });
     }
 
-    public ArrayList<String> getDates(String filename) {
-        return db.get(filename);
+    public String getLastModificationDate(String filePath) {
+        return db.get(filePath).getLastModificationDate();
     }
 
-    public void addFileAndDate(String filename, String date) {
-        ArrayList<String> dates = getDates(filename);
-        if (dates == null)
-            dates = new ArrayList<>();
-        dates.add(date);
-        db.put(filename, dates);
+    public void addChunk(String filePath, String lastModificationDate, int chunkId, int desiredReplicationDegree, int detectedReplicationDegree) {
+        DBFileData dbFileData = db.get(filePath);
+        if (dbFileData == null)
+            dbFileData = new DBFileData(filePath, lastModificationDate);
+        dbFileData.addFileChunkData(new FileChunkData(chunkId, desiredReplicationDegree, detectedReplicationDegree));
+        db.put(filePath, dbFileData);
     }
-    
-    public void removeFileAndDate(String filename){
-    	//TODO
+
+    public void removeFile(String filePath) {
+        db.remove(filePath);
     }
+
+    public long getStorageSize() {
+        return storageSize;
+    }
+
+    public void setStorageSize(long storageSize) {
+        this.storageSize = storageSize;
+    }
+
+    public DBFileData getDBFileData(String fileId) {
+        return db.get(fileId);
+    }
+
 }
