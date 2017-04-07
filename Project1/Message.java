@@ -22,10 +22,10 @@ public class Message {
     private String fileId;  // SHA256 ASCII string
     private String chunkNo; // Not negative integer not larger than 6 chars
     private String replicationDeg;  // Number in [1,9]
-    private byte[] header;
+    private byte[] header; //TODO Not necessary
     private byte[] body;
-    private int header_size;
-    private int max_body_size = 64000 - header_size;
+    private int header_size; //TODO Not necessary
+    private int max_body_size = 64000 - header_size; //TODO Not necessary
 
     public Message(byte[] message) {
         byte[][] msgSplitted = splitHeaderFromBody(message);
@@ -54,17 +54,6 @@ public class Message {
             if (repDeg < 1 || repDeg > 9)
                 throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
         }
-    }
-
-    //Construct a PUTCHUNK message to send
-    public Message(ServerObject serverInfo, String fileId, int chunkNumber, int replicationDegree){
-    	this.messageType = "PUTCHUNK";
-    	
-    	setVersion(serverInfo.getProtocolVersion());
-    	setSenderId(serverInfo.getServerId());
-    	setRepDegree(replicationDegree);
-    	setChunkNo(chunkNumber);
-    	this.fileId = fileId;
     }
     
     public int setBodyData(byte[] data) {
@@ -151,6 +140,7 @@ public class Message {
         return new byte[][]{header, body};
     }
     
+    //TODO Refactor to Backup as requestBackup
     public int generateHeader() throws InvalidAttributesException{
     	checkAttributes();
     	
@@ -171,6 +161,7 @@ public class Message {
     	return this.max_body_size;
     }
     
+    //TODO Not necessary
     private void checkAttributes() throws InvalidAttributesException{
     	//TODO improve this verification. Before generating, the fields may be altered and become invalid
     	if(this.messageType == null)
@@ -186,6 +177,8 @@ public class Message {
     	else if(this.replicationDeg == null)
     		throw new InvalidAttributesException("Invalid replication degree: " + this.replicationDeg);
     }
+    
+  //TODO Not necessary
     public String messageTypeToString(MESSAGE_TYPE mt) {
     	switch(mt){
     	case PUTCHUNK:
@@ -204,7 +197,8 @@ public class Message {
     		return "error"; //TODO throw exception??
     	}
     }
-    
+  
+    //TODO Not necessary
     private boolean lessThan6Chars(int number){
     	if((number / 1000000) != 0)
     		return false;
@@ -212,6 +206,7 @@ public class Message {
     		return true;
     }
     
+    //TODO Not necessary
     private void setVersion(String version) {
     	if(version.length() != 3)
     		throw new IllegalArgumentException("Invalid protocol version string length (must be <digit>.<digit>)");
@@ -220,6 +215,8 @@ public class Message {
     	else
     		this.version = version;
     }
+    
+    //TODO Not necessary
     private void setSenderId(int senderId) {    	
     	if(senderId < 0)
             throw new IllegalArgumentException("Invalid senderId (must be not negative).");
@@ -227,6 +224,7 @@ public class Message {
     		this.senderId = Integer.toString(senderId);
     }
     
+    //TODO Not necessary
     private void setRepDegree(int replicationDegree){
     	if(replicationDegree < 1 || replicationDegree > 9)
     		throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
@@ -234,6 +232,7 @@ public class Message {
     		this.replicationDeg = Integer.toString(replicationDegree);
     }
     
+    //TODO Not necessary
     private void setChunkNo(int chunkNumber){
     	if(chunkNumber < 0)
     		throw new IllegalArgumentException("Invalid chunkNo (must be not negative).");
@@ -243,6 +242,7 @@ public class Message {
     		this.chunkNo = Integer.toString(chunkNumber);
     }
     
+    //TODO Insert this instructions in generateHeader (requestBackup)
     public byte[] generateByteArray(){
     	byte[] c = 	new byte[header.length + body.length];
     	System.arraycopy(header, 0, c, 0, header.length);

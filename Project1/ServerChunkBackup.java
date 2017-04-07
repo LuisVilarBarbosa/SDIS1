@@ -15,9 +15,9 @@ public class ServerChunkBackup {
 	private static final int maxDelayTime = 400;
 	private static final String chunkFolder = "/chunks";
 	
-	public static void putChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh, Message message, int replicationDegree) throws RemoteException {
+	public static void putChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh, byte[] chunk, int replicationDegree) throws RemoteException {
 		//Send the chunk
-		mDataBackupCh.send(message.generateByteArray());
+		mDataBackupCh.send(chunk);
 		
 		//Wait in the control channel for STORED messages
 		// - Count number of STORED's received in 1 sec

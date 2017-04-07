@@ -24,7 +24,7 @@ public class ServerObject implements ServerRMI {
     }
 
     public void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException {
-    	//TODO criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
+    	//TODO (EDIT1:BYTE JA GUARDA OS DADOS) criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
     	
     	//Add file info to database table
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -34,7 +34,7 @@ public class ServerObject implements ServerRMI {
     	this.db.addFileAndDate(filename, date.toString());
     	String fileId = calculateFileId(filename);
     	
-    	ServerFileBackup.backup(this, fileId, replicationDegree, data, size);
+    	ServerFileBackup.backup(this, fileId, replicationDegree, data);
     	//Responsavel por
     	// - Chamar o objeto que vai tratar da divis�o do ficheiro/envio
     	// - Guardar a info do objeto na base de dados

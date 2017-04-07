@@ -5,42 +5,28 @@ import javax.naming.directory.InvalidAttributesException;
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 public class ServerFileBackup {
 	
-	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data, long size) throws RemoteException {
+	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data) throws RemoteException {
 		//Responsavel por 
 		// - Dividir em chunks
 		// - Criar chunk no e Message
 		// - Chamar o ChunkBackup
 		
-		long bytesRead = 0;
-		int bytesRemaining = (int)(size - bytesRead);
+		int bytesRead = 0;
 		
-		for(long chunkNumber = 0; bytesRead < size; chunkNumber++){
+		for(long chunkNumber = 0; bytesRead < data.length; chunkNumber++){			
+			//Generate header
+			StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
+			headerBuilder.append(serverInfo.getProtocolVersion()).append(" ").
+			append(serverInfo.getServerId()).append(" ").
+			append(fileId).append(" ").
+			append(chunkNumber).append(" ").
+			append(replicationDegree).append(" ").
+			append("\n\n");
 			
-			Message chunk = new Message(serverInfo, fileId, (int)chunkNumber, replicationDegree);
-			int chunkBodySize;
+			//TODO Verify if this works, or if a ByteArrayOutputStream is needed
+			byte[] chunk = headerBuilder.toString().getBytes();
 			
-			try {
-				chunkBodySize = chunk.generateHeader();
-			} catch (InvalidAttributesException e) {
-				chunkNumber--;
-				continue;
-			}
-			byte[] chunkBody;
-			
-			if(bytesRemaining < chunkBodySize) //Last Chunk
-			{
-				chunkBody = new byte[bytesRemaining];
-				System.arraycopy(data, (int)bytesRead, chunkBody, 0, bytesRemaining);
-			} else {
-				chunkBody = new byte[chunkBodySize];
-				System.arraycopy(data, (int)bytesRead, chunkBody, 0, chunkBodySize);
-			}
-			
-			chunk.setBodyData(chunkBody);
-			
-			//TODO é preciso estas 2 variaveis? Ja nao consigo pensar direito
-			bytesRead = bytesRead + chunkBodySize;
-			bytesRemaining = bytesRemaining - chunkBodySize;
+			//TODO Import 64kbits from the data array
 			
 			//TODO Send data to Chunk Backup
 			ServerChunkBackup.putChunk(serverInfo.getProtocolVersion(), 
