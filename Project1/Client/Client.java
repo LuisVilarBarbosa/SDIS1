@@ -80,10 +80,7 @@ public class Client {
     }
 
     private static void fileRestore(ServerRMI serverRMI, String filename) throws IOException {
-        byte[] fileData = serverRMI.restore(filename);
-        FileOutputStream fileOutputStream = new FileOutputStream(filename);
-        fileOutputStream.write(fileData);
-        fileOutputStream.close();
+        serverRMI.restore(filename);
     }
 
     private static void fileDeletion(ServerRMI serverRMI, String filename) throws RemoteException {

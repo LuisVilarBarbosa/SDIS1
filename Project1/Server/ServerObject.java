@@ -46,10 +46,10 @@ public class ServerObject implements ServerRMI {
     	// - Guardar a info do objeto na base de dados
     }
 
-    public byte[] restore(String filename) throws RemoteException {
+    public void restore(String filename) throws RemoteException {
         // Concurrency is missing
         String fileId = calculateFileId(filename);
-        return ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, fileId);
+        ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, filename, fileId);
     }
 
     public void delete(String filename) throws RemoteException {
@@ -60,9 +60,9 @@ public class ServerObject implements ServerRMI {
 
     private String calculateFileId(String filename) {
         String fileId = null;
+        String date = db.getDBFileData(filename).getLastModificationDate();
         try {
-            ArrayList<String> dates = db.getDates(filename);
-            fileId = SHA256.SHA256(filename + dates.get(dates.size() - 1));
+            fileId = SHA256.SHA256(filename + date);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

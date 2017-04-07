@@ -7,7 +7,7 @@ public interface ServerRMI extends Remote {
 
     void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException;
 
-    byte[] restore(String filename) throws RemoteException;
+    void restore(String filename) throws RemoteException;
 
     void delete(String filename) throws RemoteException;
 }
