@@ -148,4 +148,21 @@ public class ServerDatabase {
         return storedFiles.get(filePath);
     }
 
+    public long getUsedStorage() {
+        ArrayList<String> storedFilesPaths = getStoredFilesPaths();
+        int storedFilesPathsSize = storedFilesPaths.size();
+        long usedStorage = 0;
+        for(int i = 0; i < storedFilesPathsSize; i++) {
+            DBFileData dbFileData = storedFiles.get(storedFilesPaths.get(i));
+            int numFileChunks = dbFileData.getNumFileChunks();
+            for(int j = 0; j < numFileChunks; j++)
+                usedStorage += dbFileData.getFileChunkData(j).getSize();
+        }
+        return usedStorage;
+    }
+
+    public long getFreeStorage() {
+        return storageCapacity - getUsedStorage();
+    }
+
 }
