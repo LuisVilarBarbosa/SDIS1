@@ -65,11 +65,10 @@ public class ServerObject implements ServerRMI {
         return ServerState.retrieveState(this);
     }
 
-    private String calculateFileId(String filePath) {
+    private String calculateFileId(String filePath, String lastModificationDate) {
         String fileId = null;
-        String date = db.getDBFileData(filePath).getLastModificationDate();
         try {
-            fileId = SHA256.SHA256(filePath + date);
+            fileId = SHA256.SHA256(filePath + lastModificationDate);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
