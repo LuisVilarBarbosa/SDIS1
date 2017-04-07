@@ -1,3 +1,5 @@
+package Project1.Server;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 

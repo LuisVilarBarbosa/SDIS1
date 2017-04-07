@@ -1,3 +1,8 @@
+package Project1.Server;
+
+import Project1.Database.ServerDatabase;
+import Project1.General.SHA256;
+
 import java.io.File;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
@@ -37,7 +42,7 @@ public class ServerObject implements ServerRMI {
     	
     	ServerFileBackup.backup(this, fileId, replicationDegree, data);
     	//Responsavel por
-    	// - Chamar o objeto que vai tratar da divisão do ficheiro/envio
+    	// - Chamar o objeto que vai tratar da divisï¿½o do ficheiro/envio
     	// - Guardar a info do objeto na base de dados
     }
 

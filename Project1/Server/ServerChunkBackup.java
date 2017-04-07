@@ -1,3 +1,5 @@
+package Project1.Server;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -106,7 +108,7 @@ public class ServerChunkBackup {
 	}
 	
 	
-	//TODO mudar para serverID/file/chunknum(.file) nao leva o .file, é so para se perceber que é um ficheiro
+	//TODO mudar para serverID/file/chunknum(.file) nao leva o .file, ï¿½ so para se perceber que ï¿½ um ficheiro
 	private static String generateFilePath(String fileId, String chunkNum) {
 		return chunkFolder + "/" + fileId + "_" + chunkNum + ".txt";
 	}

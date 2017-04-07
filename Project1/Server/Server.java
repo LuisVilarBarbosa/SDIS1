@@ -1,3 +1,7 @@
+package Project1.Server;
+
+import Project1.Database.ServerDatabase;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;

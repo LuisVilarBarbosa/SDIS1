@@ -1,3 +1,5 @@
+package Project1.General;
+
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

@@ -1,3 +1,7 @@
+package Project1.Client;
+
+import Project1.Server.ServerRMI;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

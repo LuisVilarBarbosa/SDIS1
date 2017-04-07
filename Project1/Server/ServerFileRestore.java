@@ -1,3 +1,5 @@
+package Project1.Server;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -12,7 +14,7 @@ public class ServerFileRestore {
 
             do {
                 data = ServerChunkRestore.requestChunk(protocolVersion, serverId, mControlCh, mDataRecoveryCh, fileId, chunkNo);
-                file.write(data); //TODO Está a acumular o ficheiro todo na stream. Modificar para mudar logo
+                file.write(data); //TODO Estï¿½ a acumular o ficheiro todo na stream. Modificar para mudar logo
                 chunkNo++;
             } while (data.length == ServerChunkRestore.chunkSize);
         } catch (IOException e) {

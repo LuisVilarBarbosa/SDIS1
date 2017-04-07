@@ -1,3 +1,5 @@
+package Project1.Database;
+
 public class FileChunkData {
     private int chunkId;
     private int desiredReplicationDegree;

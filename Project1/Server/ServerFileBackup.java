@@ -1,8 +1,11 @@
+package Project1.Server;
+
 import java.rmi.RemoteException;
 
 import javax.naming.directory.InvalidAttributesException;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
+
 public class ServerFileBackup {
 	
 	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data) throws RemoteException {

@@ -1,6 +1,8 @@
-/* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
+package Project1.Server;
 
 import java.io.*;
+
+/* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
 
 public class ServerFileDeletion {
     public static final int chunkSize = 64000;
