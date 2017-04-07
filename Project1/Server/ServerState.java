@@ -25,23 +25,23 @@ public class ServerState {
     }
 
     private static void generatePartialState(ServerDatabase db, StringBuilder sb, int filesType, boolean appendSize) {
-        ArrayList<String> filesPaths;
+        ArrayList<String> filesIds;
         if (filesType == backedUpFiles)
-            filesPaths = db.getBackedUpFilesPaths();
+            filesIds = db.getBackedUpFilesIds();
         else if (filesType == storedFiles)
-            filesPaths = db.getStoredFilesPaths();
+            filesIds = db.getStoredFilesIds();
         else {
             sb.append("generatePartialState: Invalid 'filesType'.\r\n");
             return;
         }
 
-        for (int i = 0; i < filesPaths.size(); i++) {
-            String filePath = filesPaths.get(i);
+        for (int i = 0; i < filesIds.size(); i++) {
+            String fileId = filesIds.get(i);
             DBFileData dbFileData;
             if (filesType == backedUpFiles)
-                dbFileData = db.getBackedUpFileData(filePath);
+                dbFileData = db.getBackedUpFileData(fileId);
             else // if(filesType == storedFiles)
-                dbFileData = db.getStoredFileData(filePath);
+                dbFileData = db.getStoredFileData(fileId);
 
             sb.append("File path: ").append(dbFileData.getFilePath()).append("\r\n");
             sb.append("File id: ").append(dbFileData.getFileId()).append("\r\n");
