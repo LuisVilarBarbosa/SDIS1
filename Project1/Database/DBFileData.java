@@ -4,33 +4,39 @@ import java.util.HashMap;
 
 public class DBFileData {
     private String filePath;
-    private String lastModificationDate;
+    private String fileId;
+    private int desiredReplicationDegree;
     private HashMap<Integer, FileChunkData> fileChunksData;
 
-    public DBFileData(String filePath, String lastModificationDate) {
+    public DBFileData(String filePath, String fileId, int desiredReplicationDegree) {
         this.filePath = filePath;
-        this.lastModificationDate = lastModificationDate;
-        this.fileChunksData = new HashMap<Integer, FileChunkData>();
+        this.fileId = fileId;
+        this.desiredReplicationDegree = desiredReplicationDegree;
+        this.fileChunksData = new HashMap<>();
     }
 
     public String getFilePath() {
         return filePath;
     }
 
-    public String getLastModificationDate() {
-        return lastModificationDate;
+    public String getFileId() {
+        return fileId;
     }
 
-    public FileChunkData getFileChunkData(int chunkId) {
-        return fileChunksData.get(chunkId);
+    public int getDesiredReplicationDegree() {
+        return desiredReplicationDegree;
+    }
+
+    public FileChunkData getFileChunkData(int chunkNo) {
+        return fileChunksData.get(chunkNo);
     }
 
     public int getNumFileChunks() {
         return fileChunksData.size();
     }
 
-    public void addFileChunkData(FileChunkData fileChunkData) {
-        fileChunksData.put(fileChunkData.getChunkId(), fileChunkData);
+    public void addOrUpdateFileChunkData(FileChunkData fileChunkData) {
+        fileChunksData.put(fileChunkData.getChunkNo(), fileChunkData);
     }
 
 }

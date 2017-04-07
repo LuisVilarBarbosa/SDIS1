@@ -1,30 +1,30 @@
 package Project1.Database;
 
 public class FileChunkData {
-    private int chunkId;
-    private int desiredReplicationDegree;
-    private int detectedReplicationDegree;
+    private int chunkNo;
+    private long size;
+    private int perceivedReplicationDegree;
 
-    public FileChunkData(int chunkId, int desiredReplicationDegree, int detectedReplicationDegree) {
-        this.chunkId = chunkId;
-        this.desiredReplicationDegree = desiredReplicationDegree;
-        this.detectedReplicationDegree = detectedReplicationDegree;
+    public FileChunkData(int chunkNo, long size, int perceivedReplicationDegree) {
+        this.chunkNo = chunkNo;
+        this.size = size;
+        this.perceivedReplicationDegree = perceivedReplicationDegree;
     }
 
-    public int getChunkId() {
-        return chunkId;
+    public int getChunkNo() {
+        return chunkNo;
     }
 
-    public int getDesiredReplicationDegree() {
-        return desiredReplicationDegree;
+    public long getSize() {
+        return size;
     }
 
-    public int getDetectedReplicationDegree() {
-        return detectedReplicationDegree;
+    public int getPerceivedReplicationDegree() {
+        return perceivedReplicationDegree;
     }
 
-    public void setDetectedReplicationDegree(int detectedReplicationDegree) {
-        this.detectedReplicationDegree = detectedReplicationDegree;
+    public void getPerceivedReplicationDegree(int perceivedReplicationDegree) {
+        this.perceivedReplicationDegree = perceivedReplicationDegree;
     }
 
 }
