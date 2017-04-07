@@ -48,23 +48,32 @@ public class Server {
 
         ServerDatabase db = new ServerDatabase(serverId);
 
-        Timer timer1 = new Timer();
-        TimerTask timerTask1 = new TimerTask() {
+        Timer timer2 = new Timer();
+        TimerTask timerTask2 = new TimerTask() {
             @Override
             public void run() {
                 ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh);
             }
         };
-        timer1.schedule(timerTask1, 0);
+        timer2.schedule(timerTask2, 0);
 
-        Timer timer2 = new Timer();
-        TimerTask timerTask2 = new TimerTask() {
+        Timer timer3 = new Timer();
+        TimerTask timerTask3 = new TimerTask() {
             @Override
             public void run() {
                 ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh);
             }
         };
-        timer2.schedule(timerTask2, 0);
+        timer3.schedule(timerTask3, 0);
+
+        Timer timer4 = new Timer();
+        TimerTask timerTask4 = new TimerTask() {
+            @Override
+            public void run() {
+                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh);
+            }
+        };
+        timer4.schedule(timerTask4, 0);
 
         try {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
