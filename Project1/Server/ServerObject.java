@@ -3,12 +3,10 @@ package Project1.Server;
 import Project1.Database.ServerDatabase;
 import Project1.General.SHA256;
 
-import java.io.File;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 public class ServerObject implements ServerRMI {
@@ -31,7 +29,7 @@ public class ServerObject implements ServerRMI {
     //TODO backup receives filepath, not filename. Change the things needed
     public void backup(String filePath, byte[] data, long size, int replicationDegree) throws RemoteException {
     	//TODO (EDIT1:BYTE JA GUARDA OS DADOS) criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
-    	
+
     	//Add file info to database table
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     	Date date = new Date(); //Actual timestamp
@@ -58,6 +56,15 @@ public class ServerObject implements ServerRMI {
         ServerFileDeletion.requestDeletion(protocolVersion, serverId, mControlCh, fileId);
     }
 
+    public void manageStorage(long newStorageSpace) throws RemoteException {
+        ServerSpaceReclaiming.updateStorageSpace(protocolVersion, serverId, mControlCh, newStorageSpace);
+    }
+
+    public String state() throws RemoteException {
+        // Concurrency is missing
+        return ServerState.retriveState();
+    }
+
     private String calculateFileId(String filePath) {
         String fileId = null;
         String date = db.getDBFileData(filePath).getLastModificationDate();
@@ -68,7 +75,7 @@ public class ServerObject implements ServerRMI {
         }
         return fileId;
     }
-    
+
     public String getProtocolVersion(){ return protocolVersion; }
     public int getServerId() { return serverId; }
     public Multicast getControlChannel() { return mControlCh; }

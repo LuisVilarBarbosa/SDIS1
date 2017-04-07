@@ -10,4 +10,8 @@ public interface ServerRMI extends Remote {
     void restore(String filePath) throws RemoteException;
 
     void delete(String filePath) throws RemoteException;
+
+    void manageStorage(long newStorageSpace) throws RemoteException;
+
+    String state() throws RemoteException;
 }

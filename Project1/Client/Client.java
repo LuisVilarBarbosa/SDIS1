@@ -87,11 +87,11 @@ public class Client {
         serverRMI.delete(filePath);
     }
 
-    private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) {
-
+    private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) throws RemoteException {
+        serverRMI.manageStorage(Long.getLong(numKBytes));
     }
 
-    private static void retrieveState(ServerRMI serverRMI) {
-
+    private static void retrieveState(ServerRMI serverRMI) throws RemoteException {
+        serverRMI.state();
     }
 }
