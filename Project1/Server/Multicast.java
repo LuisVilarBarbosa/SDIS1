@@ -80,4 +80,9 @@ public class Multicast {
     public void close() {
         socket.close();
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return new Multicast(multicastAddress, multicastPort, false);
+    }
 }
