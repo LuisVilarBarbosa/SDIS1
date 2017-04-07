@@ -6,15 +6,15 @@ import java.io.IOException;
 
 public class ServerFileRestore {
 
-    public static void restore(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String filename, String fileId) {
-        File file = new File(filename);
+    public static void restore(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String filePath, String fileId) {
+        File file = new File(filePath);
         if(file.mkdirs())
-            System.out.println("Restore: '" + filename + "' directory successfully created.");
+            System.out.println("Restore: '" + filePath + "' directory successfully created.");
         else
-            System.out.println("Restore: error creating the directory '" + filename + "'");
+            System.out.println("Restore: error creating the directory '" + filePath + "'");
 
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(filename);
+            FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             byte[] data;
             int chunkNo = 0;
 

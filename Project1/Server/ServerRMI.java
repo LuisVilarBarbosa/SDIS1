@@ -5,9 +5,9 @@ import java.rmi.RemoteException;
 
 public interface ServerRMI extends Remote {
 
-    void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException;
+    void backup(String filePath, byte[] data, long size, int replicationDegree) throws RemoteException;
 
-    void restore(String filename) throws RemoteException;
+    void restore(String filePath) throws RemoteException;
 
-    void delete(String filename) throws RemoteException;
+    void delete(String filePath) throws RemoteException;
 }

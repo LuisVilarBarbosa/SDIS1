@@ -29,7 +29,7 @@ public class ServerObject implements ServerRMI {
     }
 
     //TODO backup receives filepath, not filename. Change the things needed
-    public void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException {
+    public void backup(String filePath, byte[] data, long size, int replicationDegree) throws RemoteException {
     	//TODO (EDIT1:BYTE JA GUARDA OS DADOS) criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
     	
     	//Add file info to database table
@@ -37,8 +37,8 @@ public class ServerObject implements ServerRMI {
     	Date date = new Date(); //Actual timestamp
     	dateFormat.format(date);
     	
-    	this.db.addFileAndDate(filename, date.toString());
-    	String fileId = calculateFileId(filename);
+    	this.db.addFileAndDate(filePath, date.toString());
+    	String fileId = calculateFileId(filePath);
     	
     	ServerFileBackup.backup(this, fileId, replicationDegree, data);
     	//Responsavel por
@@ -46,23 +46,23 @@ public class ServerObject implements ServerRMI {
     	// - Guardar a info do objeto na base de dados
     }
 
-    public void restore(String filename) throws RemoteException {
+    public void restore(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filename);
-        ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, filename, fileId);
+        String fileId = calculateFileId(filePath);
+        ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, filePath, fileId);
     }
 
-    public void delete(String filename) throws RemoteException {
+    public void delete(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filename);
+        String fileId = calculateFileId(filePath);
         ServerFileDeletion.requestDeletion(protocolVersion, serverId, mControlCh, fileId);
     }
 
-    private String calculateFileId(String filename) {
+    private String calculateFileId(String filePath) {
         String fileId = null;
-        String date = db.getDBFileData(filename).getLastModificationDate();
+        String date = db.getDBFileData(filePath).getLastModificationDate();
         try {
-            fileId = SHA256.SHA256(filename + date);
+            fileId = SHA256.SHA256(filePath + date);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

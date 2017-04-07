@@ -65,9 +65,9 @@ public class Client {
         }
     }
 
-    private static void fileBackup(ServerRMI serverRMI, String filename, String replicationDegree) throws IOException {
-    	FileInputStream fileInputStream = new FileInputStream(filename);
-    	File file = new File(filename);
+    private static void fileBackup(ServerRMI serverRMI, String filePath, String replicationDegree) throws IOException {
+    	FileInputStream fileInputStream = new FileInputStream(filePath);
+    	File file = new File(filePath);
     	
     	
     	long fileSize = file.length();
@@ -75,16 +75,16 @@ public class Client {
     	
     	byte[] fileData = new byte[(int)fileSize]; //TODO com int filesize só dá ate 4GB. Arranjar maneira de ter mais
     	fileInputStream.read(fileData);
-    	serverRMI.backup(filename, fileData, fileSize, Integer.parseInt(replicationDegree)); //TODO surround with try catch(RemoteException)
+    	serverRMI.backup(filePath, fileData, fileSize, Integer.parseInt(replicationDegree)); //TODO surround with try catch(RemoteException)
     	fileInputStream.close();
     }
 
-    private static void fileRestore(ServerRMI serverRMI, String filename) throws IOException {
-        serverRMI.restore(filename);
+    private static void fileRestore(ServerRMI serverRMI, String filePath) throws IOException {
+        serverRMI.restore(filePath);
     }
 
-    private static void fileDeletion(ServerRMI serverRMI, String filename) throws RemoteException {
-        serverRMI.delete(filename);
+    private static void fileDeletion(ServerRMI serverRMI, String filePath) throws RemoteException {
+        serverRMI.delete(filePath);
     }
 
     private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) {
