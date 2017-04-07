@@ -48,6 +48,15 @@ public class Server {
 
         ServerDatabase db = new ServerDatabase(serverId);
 
+        Timer timer1 = new Timer();
+        TimerTask timerTask1 = new TimerTask() {
+            @Override
+            public void run() {
+                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataRecoveryCh);
+            }
+        };
+        timer1.schedule(timerTask1, 0);
+
         Timer timer2 = new Timer();
         TimerTask timerTask2 = new TimerTask() {
             @Override

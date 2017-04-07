@@ -63,7 +63,7 @@ public class ServerChunkBackup {
 		
 	}
 	
-	public static void storeChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh) throws FileNotFoundException {
+	public static void storeChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh) {
 		//Receive chunk
 		//Create file name
 		//After random delay (0 - 400 ms)
