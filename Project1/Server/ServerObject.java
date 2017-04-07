@@ -36,7 +36,7 @@ public class ServerObject implements ServerRMI {
     	dateFormat.format(date);
     	
     	this.db.addFileAndDate(filePath, date.toString());
-    	String fileId = calculateFileId(filePath);
+    	String fileId = calculateFileId(filePath, date.toString());
     	
     	ServerFileBackup.backup(this, fileId, replicationDegree, data);
     	//Responsavel por
@@ -46,17 +46,18 @@ public class ServerObject implements ServerRMI {
 
     public void restore(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filePath);
+        String fileId = db.getBackedUpFileId(filePath);
         ServerFileRestore.restore(this, filePath, fileId);
     }
 
     public void delete(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filePath);
+        String fileId = db.getBackedUpFileId(filePath);
         ServerFileDeletion.requestDeletion(this, fileId);
     }
 
     public void manageStorage(long newStorageSpace) throws RemoteException {
+        // Concurrency is missing
         ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace);
     }
 
