@@ -52,7 +52,7 @@ public class Server {
         TimerTask timerTask1 = new TimerTask() {
             @Override
             public void run() {
-                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataBackupCh);
+                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataBackupCh, db);
             }
         };
         timer1.schedule(timerTask1, 0);
@@ -61,7 +61,7 @@ public class Server {
         TimerTask timerTask2 = new TimerTask() {
             @Override
             public void run() {
-                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh);
+                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh, db);
             }
         };
         timer2.schedule(timerTask2, 0);
@@ -70,7 +70,7 @@ public class Server {
         TimerTask timerTask3 = new TimerTask() {
             @Override
             public void run() {
-                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh);
+                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh, db);
             }
         };
         timer3.schedule(timerTask3, 0);

@@ -1,5 +1,7 @@
 package Project1.Server;
 
+import Project1.Database.ServerDatabase;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,7 +30,7 @@ public class ServerChunkRestore {
         return m.getBody();
     }
 
-    public static void chunkProvider(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh) {
+    public static void chunkProvider(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, ServerDatabase db) {
         byte[] data = new byte[chunkSize];
         while (true) {
             try {
