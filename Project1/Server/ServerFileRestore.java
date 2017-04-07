@@ -6,12 +6,17 @@ import java.io.IOException;
 
 public class ServerFileRestore {
 
-    public static void restore(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String filePath, String fileId) {
+    public static void restore(ServerObject serverObject, String filePath, String fileId) {
         File file = new File(filePath);
         if(file.mkdirs())
             System.out.println("Restore: '" + filePath + "' directory successfully created.");
         else
             System.out.println("Restore: error creating the directory '" + filePath + "'");
+
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
@@ -19,7 +24,7 @@ public class ServerFileRestore {
             int chunkNo = 0;
 
             do {
-                data = ServerChunkRestore.requestChunk(protocolVersion, serverId, mControlCh, mDataRecoveryCh, fileId, chunkNo);
+                data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
                 fileOutputStream.write(data);
                 chunkNo++;
             } while (data.length == ServerChunkRestore.chunkSize);

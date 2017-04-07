@@ -52,7 +52,7 @@ public class Server {
         TimerTask timerTask1 = new TimerTask() {
             @Override
             public void run() {
-                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataRecoveryCh);
+                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataBackupCh);
             }
         };
         timer1.schedule(timerTask1, 0);
@@ -79,7 +79,7 @@ public class Server {
         TimerTask timerTask4 = new TimerTask() {
             @Override
             public void run() {
-                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh);
+                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh, db);
             }
         };
         timer4.schedule(timerTask4, 0);

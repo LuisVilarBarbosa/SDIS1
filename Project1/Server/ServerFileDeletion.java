@@ -6,7 +6,11 @@ import java.io.*;
 
 public class ServerFileDeletion {
 
-    public static void requestDeletion(String protocolVersion, int serverId, Multicast mControlCh, String fileId) {
+    public static void requestDeletion(ServerObject serverObject, String fileId) {
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+
         StringBuilder st = new StringBuilder("DELETE ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());

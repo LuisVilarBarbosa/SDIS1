@@ -23,7 +23,10 @@ public class ServerChunkBackup {
 	
 	//TODO Implement the option to use enhanced protocol, or not. MUST HAVE BOTH VERSIONS
 	
-	public static void putChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh, byte[] chunk, int replicationDegree) throws RemoteException {
+	public static void putChunk(ServerObject serverObject, byte[] chunk, int replicationDegree) throws RemoteException {
+		Multicast mControlCh = serverObject.getControlChannel();
+		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+
 		//Send the chunk
 		mDataBackupCh.send(chunk);
 		
@@ -70,6 +73,7 @@ public class ServerChunkBackup {
 		// - On other thread, wait for other stores, to count the replication degree
 		// - Create file
 		// - Write content to file
+
 		Message chunk = new Message(mDataBackupCh.receive());
 		
 		Random randomGenerator = new Random();

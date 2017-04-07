@@ -8,7 +8,7 @@ import javax.naming.directory.InvalidAttributesException;
 
 public class ServerFileBackup {
 	
-	public static void backup(ServerObject serverInfo, String fileId, int replicationDegree, byte[] data) throws RemoteException {
+	public static void backup(ServerObject serverObject, String fileId, int replicationDegree, byte[] data) throws RemoteException {
 		//Responsavel por 
 		// - Dividir em chunks
 		// - Criar chunk no e Message
@@ -21,8 +21,8 @@ public class ServerFileBackup {
 		for(long chunkNumber = 0; bytesRead < data.length; chunkNumber++){			
 			//TODO Generate header in ServerChunkBackup
 			StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
-			headerBuilder.append(serverInfo.getProtocolVersion()).append(" ").
-			append(serverInfo.getServerId()).append(" ").
+			headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
+			append(serverObject.getServerId()).append(" ").
 			append(fileId).append(" ").
 			append(chunkNumber).append(" ").
 			append(replicationDegree).append(" ").
@@ -34,11 +34,7 @@ public class ServerFileBackup {
 			//TODO Import 64kbits from the data array
 			
 			//TODO Send data to Chunk Backup
-			ServerChunkBackup.putChunk(serverInfo.getProtocolVersion(), 
-					serverInfo.getServerId(), 
-					serverInfo.getControlChannel(),
-					serverInfo.getDataBackupChannel(), 
-					chunk, replicationDegree, chunkNo);
+			ServerChunkBackup.putChunk(serverObject, chunk, replicationDegree, chunkNo);
 		}
 		
 	}

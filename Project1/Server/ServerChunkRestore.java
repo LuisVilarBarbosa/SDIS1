@@ -13,7 +13,12 @@ public class ServerChunkRestore {
     private static final int maxWaitTime = 400; /* milliseconds */
     public static int chunkSize = 64000;
 
-    public static byte[] requestChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, String fileId, int chunkNo) {
+    public static byte[] requestChunk(ServerObject serverObject, String fileId, int chunkNo) {
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
+
         StringBuilder st = new StringBuilder("GETCHUNK ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());

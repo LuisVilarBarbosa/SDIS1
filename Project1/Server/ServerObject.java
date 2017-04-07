@@ -47,22 +47,22 @@ public class ServerObject implements ServerRMI {
     public void restore(String filePath) throws RemoteException {
         // Concurrency is missing
         String fileId = calculateFileId(filePath);
-        ServerFileRestore.restore(protocolVersion, serverId, mControlCh, mDataRecoveryCh, filePath, fileId);
+        ServerFileRestore.restore(this, filePath, fileId);
     }
 
     public void delete(String filePath) throws RemoteException {
         // Concurrency is missing
         String fileId = calculateFileId(filePath);
-        ServerFileDeletion.requestDeletion(protocolVersion, serverId, mControlCh, fileId);
+        ServerFileDeletion.requestDeletion(this, fileId);
     }
 
     public void manageStorage(long newStorageSpace) throws RemoteException {
-        ServerSpaceReclaiming.updateStorageSpace(protocolVersion, serverId, mControlCh, newStorageSpace);
+        ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace);
     }
 
     public String state() throws RemoteException {
         // Concurrency is missing
-        return ServerState.retriveState();
+        return ServerState.retrieveState(this);
     }
 
     private String calculateFileId(String filePath) {
@@ -81,4 +81,5 @@ public class ServerObject implements ServerRMI {
     public Multicast getControlChannel() { return mControlCh; }
     public Multicast getDataBackupChannel() { return mDataBackupCh; }
     public Multicast getDataRecoveryChannel() { return mDataRecoveryCh; }
+    public ServerDatabase getDb() { return db; }
 }
