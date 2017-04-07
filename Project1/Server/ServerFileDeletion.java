@@ -5,7 +5,6 @@ import java.io.*;
 /* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
 
 public class ServerFileDeletion {
-    public static final int chunkSize = 64000;
 
     public static void requestDeletion(String protocolVersion, int serverId, Multicast mControlCh, String fileId) {
         StringBuilder st = new StringBuilder("DELETE ");
@@ -14,7 +13,6 @@ public class ServerFileDeletion {
     }
 
     public static void fileChunksDeleter(String protocolVersion, int serverId, Multicast mControlCh) {
-        byte[] data = new byte[chunkSize];
         while (true) {
                 byte[] request = mControlCh.receive();
                 Message m = new Message(request);
