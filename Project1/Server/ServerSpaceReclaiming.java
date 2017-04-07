@@ -7,7 +7,11 @@ import Project1.Database.FileChunkData;
 import Project1.Database.ServerDatabase;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ServerSpaceReclaiming {
 
@@ -43,7 +47,53 @@ public class ServerSpaceReclaiming {
 
     public static void monitorStorageSpaceChanges(String protocolVersion, int serverId, Multicast mControlCh, ServerDatabase db) {
         while (true) {
+            try {
+                byte[] info1 = mControlCh.receive(); //Removed info
+                Message m1 = new Message(info1);
 
+                if (m1.getMessageType().equalsIgnoreCase("REMOVED") && m1.getVersion().equalsIgnoreCase(protocolVersion)) {
+                    String fileId = m1.getFileId();
+                    int chunkNo = Integer.getInteger(m1.getChunkNo());
+
+                    // continue if chunk not stored
+                    DBFileData dbFileData = db.getStoredFileData(fileId);
+                    if (dbFileData == null)
+                        continue;
+                    FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
+                    if (fileChunkData == null)
+                        continue;
+
+                    int newRepDeg = fileChunkData.getPerceivedReplicationDegree() - 1;
+                    fileChunkData.setPerceivedReplicationDegree(newRepDeg);
+
+                    //Notification that other server has attended the request first
+                    byte[] info2 = null;
+                    mControlCh.receive(new Random().nextInt() % 400);
+                    Message m2 = new Message(info2);
+                    if (m2.getMessageType().equalsIgnoreCase("PUTCHUNK") &&
+                            m2.getVersion().equalsIgnoreCase(protocolVersion) &&
+                            m2.getSenderId().equalsIgnoreCase(m1.getSenderId()) &&
+                            m2.getFileId().equalsIgnoreCase(m1.getFileId()) &&
+                            m2.getChunkNo().equalsIgnoreCase(m1.getChunkNo()))
+                        continue;
+
+                    int desiredRepDeg = dbFileData.getDesiredReplicationDegree();
+                    if (newRepDeg < desiredRepDeg) {
+                        byte[] data = new byte[64000];
+                        StringBuilder path = new StringBuilder(serverId);
+                        path.append("/").append(fileId).append("/").append(chunkNo);
+                        FileInputStream file = new FileInputStream(path.toString());
+                        file.read(data);
+                        file.close();
+
+                        ServerChunkBackup.putChunk(, data, chunkNo, desiredRepDeg);
+                    }
+                }
+            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
+            } catch (IllegalArgumentException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 

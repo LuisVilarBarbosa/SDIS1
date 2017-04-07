@@ -23,7 +23,7 @@ public class FileChunkData {
         return perceivedReplicationDegree;
     }
 
-    public void getPerceivedReplicationDegree(int perceivedReplicationDegree) {
+    public void setPerceivedReplicationDegree(int perceivedReplicationDegree) {
         this.perceivedReplicationDegree = perceivedReplicationDegree;
     }
 
