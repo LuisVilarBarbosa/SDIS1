@@ -23,6 +23,7 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
+    //TODO backup receives filepath, not filename. Change the things needed
     public void backup(String filename, byte[] data, long size, int replicationDegree) throws RemoteException {
     	//TODO (EDIT1:BYTE JA GUARDA OS DADOS) criar uma estrutura de dados que guarde também o tamanho dos dados, em vez de byte[] data
     	

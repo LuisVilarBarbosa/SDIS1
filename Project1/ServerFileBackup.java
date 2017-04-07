@@ -11,10 +11,12 @@ public class ServerFileBackup {
 		// - Criar chunk no e Message
 		// - Chamar o ChunkBackup
 		
+		//1 thread por ficheiro
+		
 		int bytesRead = 0;
 		
 		for(long chunkNumber = 0; bytesRead < data.length; chunkNumber++){			
-			//Generate header
+			//TODO Generate header in ServerChunkBackup
 			StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
 			headerBuilder.append(serverInfo.getProtocolVersion()).append(" ").
 			append(serverInfo.getServerId()).append(" ").
@@ -33,7 +35,7 @@ public class ServerFileBackup {
 					serverInfo.getServerId(), 
 					serverInfo.getControlChannel(),
 					serverInfo.getDataBackupChannel(), 
-					chunk, replicationDegree);
+					chunk, replicationDegree, chunkNo);
 		}
 		
 	}

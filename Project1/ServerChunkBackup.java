@@ -15,6 +15,12 @@ public class ServerChunkBackup {
 	private static final int maxDelayTime = 400;
 	private static final String chunkFolder = "/chunks";
 	
+	
+	//TODO Create a different Multicast object for each thread
+	//Is this on this level, or higher?
+	
+	//TODO Implement the option to use enhanced protocol, or not. MUST HAVE BOTH VERSIONS
+	
 	public static void putChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh, byte[] chunk, int replicationDegree) throws RemoteException {
 		//Send the chunk
 		mDataBackupCh.send(chunk);
@@ -99,6 +105,8 @@ public class ServerChunkBackup {
 		
 	}
 	
+	
+	//TODO mudar para serverID/file/chunknum(.file) nao leva o .file, é so para se perceber que é um ficheiro
 	private static String generateFilePath(String fileId, String chunkNum) {
 		return chunkFolder + "/" + fileId + "_" + chunkNum + ".txt";
 	}
