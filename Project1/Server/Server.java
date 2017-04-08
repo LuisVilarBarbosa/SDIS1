@@ -57,7 +57,7 @@ public class Server {
 	            @Override
 	            public void run() {
 	            	//Must receive a server Object
-	                ServerChunkBackup.storeChunk(serverObj, protocolVersion, serverId, mControlCh, mDataBackupCh);
+	                ServerChunkBackup.storeChunk(serverObj);
 	            }
 	        };
 	        timer1.schedule(timerTask1, 0);
@@ -66,7 +66,7 @@ public class Server {
 	        TimerTask timerTask2 = new TimerTask() {
 	            @Override
 	            public void run() {
-	                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh, db);
+	                ServerChunkRestore.chunkProvider(serverObj);
 	            }
 	        };
 	        timer2.schedule(timerTask2, 0);
@@ -75,7 +75,7 @@ public class Server {
 	        TimerTask timerTask3 = new TimerTask() {
 	            @Override
 	            public void run() {
-	                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh, db);
+	                ServerFileDeletion.fileChunksDeleter(serverObj);
 	            }
 	        };
 	        timer3.schedule(timerTask3, 0);
@@ -84,7 +84,7 @@ public class Server {
 	        TimerTask timerTask4 = new TimerTask() {
 	            @Override
 	            public void run() {
-	                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh, db);
+	                ServerSpaceReclaiming.monitorStorageSpaceChanges(serverObj);
 	            }
 	        };
 	        timer4.schedule(timerTask4, 0);

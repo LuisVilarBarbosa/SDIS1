@@ -30,7 +30,13 @@ public class ServerChunkRestore {
         return m.getBody();
     }
 
-    public static void chunkProvider(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataRecoveryCh, ServerDatabase db) {
+    public static void chunkProvider(ServerObject serverObject) {
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
+        ServerDatabase db;  // should be used
+
         byte[] data = new byte[chunkSize];
         while (true) {
             try {

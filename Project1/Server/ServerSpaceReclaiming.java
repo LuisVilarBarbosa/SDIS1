@@ -18,6 +18,8 @@ public class ServerSpaceReclaiming {
     public static void updateStorageSpace(ServerObject serverObject, long newStorageSpace) {
         int serverId = serverObject.getServerId();
         ServerDatabase db = serverObject.getDb();
+        db.setStorageCapacity(newStorageSpace);
+
         ArrayList<String> filesIds = db.getStoredFilesIds();
         long usedStorage = db.getUsedStorage();   // just for efficiency, it could be db.getUsedStorage()
 
@@ -45,7 +47,12 @@ public class ServerSpaceReclaiming {
         }
     }
 
-    public static void monitorStorageSpaceChanges(String protocolVersion, int serverId, Multicast mControlCh, ServerDatabase db) {
+    public static void monitorStorageSpaceChanges(ServerObject serverObject) {
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+        ServerDatabase db = serverObject.getDb();
+
         while (true) {
             try {
                 byte[] info1 = mControlCh.receive(); //Removed info

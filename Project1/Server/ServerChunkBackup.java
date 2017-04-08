@@ -79,7 +79,7 @@ public class ServerChunkBackup {
 		serverObject.getDb().getBackedUpFileData(fileId).addOrUpdateFileChunkData(chunkData);	
 	}
 	
-	public static void storeChunk(ServerObject serverObject, String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh) {
+	public static void storeChunk(ServerObject serverObject) {
 		//Receive chunk
 		//Wait a random delay, while checking the replication degree
 		//After random delay (0 - 400 ms)
@@ -87,6 +87,11 @@ public class ServerChunkBackup {
 		// - Write content to file
 		// - Send STORED confirmation
 		// - Update peer's database
+		String protocolVersion = serverObject.getProtocolVersion();
+		int serverId = serverObject.getServerId();	// not used, but should be used to send STORED message
+		Multicast mControlCh = serverObject.getControlChannel();
+		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+
 		
 		Message chunk = new Message(mDataBackupCh.receive());
 		

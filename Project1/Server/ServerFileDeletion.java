@@ -18,7 +18,12 @@ public class ServerFileDeletion {
         mControlCh.send(st.toString().getBytes());
     }
 
-    public static void fileChunksDeleter(String protocolVersion, int serverId, Multicast mControlCh, ServerDatabase db) {
+    public static void fileChunksDeleter(ServerObject serverObject) {
+        String protocolVersion = serverObject.getProtocolVersion();
+        int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
+        ServerDatabase db = serverObject.getDb();
+
         while (true) {
                 byte[] request = mControlCh.receive();
                 Message m = new Message(request);
