@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 public class Client {
 
     public static void main(String args[]) {
-        if (args.length < 3 || args.length > 4) {
+        if (args.length < 2 || args.length > 4) {
             System.out.println("Client <peer_ap> <sub_protocol> <opnd_1> [<opnd_2>]");
             return;
         }
@@ -95,6 +95,6 @@ public class Client {
     }
 
     private static void retrieveState(ServerRMI serverRMI) throws RemoteException {
-        serverRMI.state();
+        System.out.println(serverRMI.state());
     }
 }

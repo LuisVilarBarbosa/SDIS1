@@ -19,8 +19,8 @@ public class ServerState {
         sb.append("\r\nStored files:\r\n");
         generatePartialState(db, sb, storedFiles, false, true);
 
-        sb.append(db.getStorageCapacity()).append(" KBytes\r\n");
-        sb.append(db.getUsedStorage()).append(" KBytes\r\n");
+        sb.append("\r\nStorage capacity: ").append(db.getStorageCapacity()).append(" KBytes\r\n");
+        sb.append("Used storage: ").append(db.getUsedStorage()).append(" KBytes\r\n");
         return sb.toString();
     }
 
