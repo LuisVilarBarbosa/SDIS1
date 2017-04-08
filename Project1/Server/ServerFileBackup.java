@@ -1,11 +1,7 @@
 package Project1.Server;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.rmi.RemoteException;
-
-import javax.naming.directory.InvalidAttributesException;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 
@@ -13,7 +9,7 @@ public class ServerFileBackup {
 	
 	public static final int CHUNK_MAX_SIZE = 64000;
 	
-	public static void backup(ServerObject serverObject, String filePath, int replicationDegree) throws IOException {
+	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) throws IOException {
 		//Responsavel por 
 		// - Abrir o ficheiro
 		// - Dividir em chunks
@@ -33,9 +29,10 @@ public class ServerFileBackup {
 			byte[] chunkData = null;
 			bytesRead = fis.read(chunkData, 0, CHUNK_MAX_SIZE);
 			
-			//TODO Send data to Chunk Backup
-			ServerChunkBackup.putChunk(serverObject, filePath, chunkData, replicationDegree, chunkNumber);
+			//Send data to Chunk Backup
+			ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
 		}
 		
+		fis.close();
 	}
 }

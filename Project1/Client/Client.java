@@ -5,7 +5,6 @@ import Project1.Server.ServerRMI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -69,13 +68,17 @@ public class Client {
     	FileInputStream fileInputStream = new FileInputStream(filePath);
     	File file = new File(filePath);
     	
-    	
-    	long fileSize = file.length();
-    	
-    	
-    	byte[] fileData = new byte[(int)fileSize]; //TODO com int filesize só dá ate 4GB. Arranjar maneira de ter mais
-    	fileInputStream.read(fileData);
-    	serverRMI.backup(filePath, fileData, fileSize, Integer.parseInt(replicationDegree)); //TODO surround with try catch(RemoteException)
+    	if(file.exists() && !file.isDirectory()) {
+    		try {
+        		serverRMI.backup(filePath, Integer.parseInt(replicationDegree));
+    		} catch(FileNotFoundException e) {
+    			System.out.println("Could not find " + filePath);
+    		} catch(RemoteException e) {
+    			e.printStackTrace();
+    		}
+    	} else {
+    		System.out.println("Invalid path");
+    	}
     	fileInputStream.close();
     }
 

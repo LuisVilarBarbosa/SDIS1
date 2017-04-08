@@ -69,7 +69,6 @@ public class Multicast {
         try {
 			socket.receive(mcastReceive);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         socket.setSoTimeout(0);

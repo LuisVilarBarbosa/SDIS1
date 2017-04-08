@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.directory.InvalidAttributesException;
 
 /* Generic message: <MessageType> <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF> */
 
@@ -24,10 +23,7 @@ public class Message {
     private String fileId;  // SHA256 ASCII string
     private String chunkNo; // Not negative integer not larger than 6 chars
     private String replicationDeg;  // Number in [1,9]
-    private byte[] header; //TODO Not necessary
     private byte[] body;
-    private int header_size; //TODO Not necessary
-    private int max_body_size = 64000 - header_size; //TODO Not necessary
 
     public Message(byte[] message) {
         byte[][] msgSplitted = splitHeaderFromBody(message);
@@ -56,23 +52,6 @@ public class Message {
             if (repDeg < 1 || repDeg > 9)
                 throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
         }
-    }
-    
-    public int setBodyData(byte[] data) {
-    	if(data.length > this.max_body_size)
-    		throw new ArrayStoreException("Invalid store: Data does not fit in the chunk body");
-    	this.body = data;
-    	
-    	if(data == null)
-    		return 0;
-    	else
-    		return data.length;
-    }
-    
-    public void setMessageType(MESSAGE_TYPE mt) {
-    	String type = messageTypeToString(mt);
-    	if(!type.equals("error"))
-    		messageType = type;
     }
     
     public String getMessageType() {
@@ -140,116 +119,5 @@ public class Message {
             throw new IllegalArgumentException(genericErrorMsg);
 
         return new byte[][]{header, body};
-    }
-    
-    //TODO Refactor to Backup as requestBackup
-    public int generateHeader() throws InvalidAttributesException{
-    	checkAttributes();
-    	
-    	StringBuilder messageBuilder = new StringBuilder();
-    	messageBuilder.append(messageType).append(' ')
-    	.append(version).append(' ')
-    	.append(senderId).append(' ')
-    	.append(fileId).append(' ')
-    	.append(chunkNo).append(' ')
-    	.append(replicationDeg).append(' ')
-    	.append("/n/n");
-    	
-    	String header = messageBuilder.toString();
-    	this.header = header.getBytes();
-    	this.header_size = this.header.length;
-    	this.max_body_size = CHUNK_MAX_SIZE - this.header_size;
-    	
-    	return this.max_body_size;
-    }
-    
-    //TODO Not necessary
-    private void checkAttributes() throws InvalidAttributesException{
-    	//TODO improve this verification. Before generating, the fields may be altered and become invalid
-    	if(this.messageType == null)
-    		throw new InvalidAttributesException("Invalid message type: " + this.messageType);
-    	else if(this.version == null)
-    		throw new InvalidAttributesException("Invalid protocol version: " + this.version);
-    	else if(this.senderId == null)
-    		throw new InvalidAttributesException("Invalid senderId: " + this.senderId);
-    	else if(this.fileId == null)
-    		throw new InvalidAttributesException("Invalid fileId: " + this.fileId);
-    	else if(this.chunkNo == null)
-    		throw new InvalidAttributesException("Invalid chunk number: " + this.chunkNo);
-    	else if(this.replicationDeg == null)
-    		throw new InvalidAttributesException("Invalid replication degree: " + this.replicationDeg);
-    }
-    
-  //TODO Not necessary
-    public String messageTypeToString(MESSAGE_TYPE mt) {
-    	switch(mt){
-    	case PUTCHUNK:
-    		return "PUTCHUNK";
-    	case CHUNK:
-    		return "CHUNK";
-    	case DELETE:
-    		return "DELETE";
-    	case GETCHUNK:
-    		return "GETCHUNK";
-    	case REMOVED:
-    		return "REMOVED";
-    	case STORED:
-    		return "STORED";
-    	default:
-    		return "error"; //TODO throw exception??
-    	}
-    }
-  
-    //TODO Not necessary
-    private boolean lessThan6Chars(int number){
-    	if((number / 1000000) != 0)
-    		return false;
-    	else
-    		return true;
-    }
-    
-    //TODO Not necessary
-    private void setVersion(String version) {
-    	if(version.length() != 3)
-    		throw new IllegalArgumentException("Invalid protocol version string length (must be <digit>.<digit>)");
-    	else if(!Character.isDigit(version.charAt(0)) || !Character.isDigit(version.charAt(2)) || version.charAt(1) != '.')
-    		throw new IllegalArgumentException("Invalid protocol version (must be <digit>.<digit>)");
-    	else
-    		this.version = version;
-    }
-    
-    //TODO Not necessary
-    private void setSenderId(int senderId) {    	
-    	if(senderId < 0)
-            throw new IllegalArgumentException("Invalid senderId (must be not negative).");
-    	else
-    		this.senderId = Integer.toString(senderId);
-    }
-    
-    //TODO Not necessary
-    private void setRepDegree(int replicationDegree){
-    	if(replicationDegree < 1 || replicationDegree > 9)
-    		throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
-    	else
-    		this.replicationDeg = Integer.toString(replicationDegree);
-    }
-    
-    //TODO Not necessary
-    private void setChunkNo(int chunkNumber){
-    	if(chunkNumber < 0)
-    		throw new IllegalArgumentException("Invalid chunkNo (must be not negative).");
-    	else if(!lessThan6Chars(chunkNumber))
-    		throw new IllegalArgumentException("Invalid chunkNo (must have 6 or less digits).");
-    	else
-    		this.chunkNo = Integer.toString(chunkNumber);
-    }
-    
-    //TODO Insert this instructions in generateHeader (requestBackup)
-    public byte[] generateByteArray(){
-    	byte[] c = 	new byte[header.length + body.length];
-    	System.arraycopy(header, 0, c, 0, header.length);
-    	System.arraycopy(body, 0, c, header.length, body.length);
-    	
-    	return c;
     }
 }

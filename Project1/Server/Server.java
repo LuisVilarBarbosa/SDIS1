@@ -47,47 +47,48 @@ public class Server {
             throw new IllegalArgumentException("Invalid access point.");
 
         ServerDatabase db = new ServerDatabase(serverId);
-
-        Timer timer1 = new Timer();
-        TimerTask timerTask1 = new TimerTask() {
-            @Override
-            public void run() {
-                ServerChunkBackup.storeChunk(protocolVersion, serverId, mControlCh, mDataBackupCh, db);
-            }
-        };
-        timer1.schedule(timerTask1, 0);
-
-        Timer timer2 = new Timer();
-        TimerTask timerTask2 = new TimerTask() {
-            @Override
-            public void run() {
-                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh, db);
-            }
-        };
-        timer2.schedule(timerTask2, 0);
-
-        Timer timer3 = new Timer();
-        TimerTask timerTask3 = new TimerTask() {
-            @Override
-            public void run() {
-                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh, db);
-            }
-        };
-        timer3.schedule(timerTask3, 0);
-
-        Timer timer4 = new Timer();
-        TimerTask timerTask4 = new TimerTask() {
-            @Override
-            public void run() {
-                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh, db);
-            }
-        };
-        timer4.schedule(timerTask4, 0);
-
         try {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
             Registry r = LocateRegistry.createRegistry(1099);   // default port
+        	
+	        Timer timer1 = new Timer();
+	        TimerTask timerTask1 = new TimerTask() {
+	            @Override
+	            public void run() {
+	            	//Must receive a server Object
+	                ServerChunkBackup.storeChunk(serverObj, protocolVersion, serverId, mControlCh, mDataBackupCh);
+	            }
+	        };
+	        timer1.schedule(timerTask1, 0);
+	
+	        Timer timer2 = new Timer();
+	        TimerTask timerTask2 = new TimerTask() {
+	            @Override
+	            public void run() {
+	                ServerChunkRestore.chunkProvider(protocolVersion, serverId, mControlCh, mDataRecoveryCh, db);
+	            }
+	        };
+	        timer2.schedule(timerTask2, 0);
+	
+	        Timer timer3 = new Timer();
+	        TimerTask timerTask3 = new TimerTask() {
+	            @Override
+	            public void run() {
+	                ServerFileDeletion.fileChunksDeleter(protocolVersion, serverId, mControlCh, db);
+	            }
+	        };
+	        timer3.schedule(timerTask3, 0);
+	
+	        Timer timer4 = new Timer();
+	        TimerTask timerTask4 = new TimerTask() {
+	            @Override
+	            public void run() {
+	                ServerSpaceReclaiming.monitorStorageSpaceChanges(protocolVersion, serverId, mControlCh, db);
+	            }
+	        };
+	        timer4.schedule(timerTask4, 0);
+
             r.rebind(remoteObjName, (Remote) serverRMI);
         } catch (RemoteException e) {
             e.printStackTrace();

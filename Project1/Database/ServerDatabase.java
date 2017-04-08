@@ -11,7 +11,7 @@ public class ServerDatabase {
     private final String dbPath;
     private long storageCapacity;    // KBytes
     private HashMap<String, DBFileData> backedUpFiles = new HashMap<>();    // backed up to other peers
-    private HashMap<String, DBFileData> storedFiles = new HashMap<>();
+    private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData> 
 
     public ServerDatabase(int serverId) {
         dbPath = serverId + "/" + dbFilename;
@@ -183,6 +183,20 @@ public class ServerDatabase {
                 return id;
         }
         return null;
+    }
+    
+    public void addBackupFile(String filePath, String fileId, int desiredReplicationDegree) {
+    	if(this.backedUpFiles.containsKey(fileId))
+    		return;
+    	DBFileData fileData = new DBFileData(filePath, fileId, desiredReplicationDegree);
+    	this.backedUpFiles.put(fileId, fileData);
+    }
+    
+    public void addStoredFile(String fileId, int desiredReplicationDegree) {
+    	if(this.storedFiles.containsKey(fileId))
+    		return;
+    	DBFileData fileData = new DBFileData("", fileId, desiredReplicationDegree);
+    	this.storedFiles.put(fileId, fileData);
     }
 
 }

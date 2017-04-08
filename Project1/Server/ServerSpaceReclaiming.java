@@ -86,7 +86,7 @@ public class ServerSpaceReclaiming {
                         file.read(data);
                         file.close();
 
-                        ServerChunkBackup.putChunk(, data, chunkNo, desiredRepDeg);
+                        ServerChunkBackup.putChunk(serverObject, fileId, data, desiredRepDeg, chunkNo);
                     }
                 }
             } catch (FileNotFoundException e) {

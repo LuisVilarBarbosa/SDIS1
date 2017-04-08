@@ -1,13 +1,13 @@
 package Project1.Server;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+
+import Project1.Database.FileChunkData;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 /* Generic message to send: STORED <Version> <SenderId> <FileId> <ChunkNo> <CRLF><CRLF> */
@@ -21,18 +21,14 @@ public class ServerChunkBackup {
 	//TODO Create a different Multicast object for each thread
 	//Is this on this level, or higher?
 	
-	//TODO Implement the option to use enhanced protocol, or not. MUST HAVE BOTH VERSIONS
-	
-	public static void putChunk(ServerObject serverObject, String filePath, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
+	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
 		Multicast mControlCh = serverObject.getControlChannel();
-		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
-		
-		//TODO aqui, o Filepath ja deve vir encriptado
+		Multicast mDataBackupCh = serverObject.getDataBackupChannel();	
 		
 		StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
 		headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
 		append(serverObject.getServerId()).append(" ").
-		append(filePath).append(" ").
+		append(fileId).append(" ").
 		append(chunkNumber).append(" ").
 		append(replicationDegree).append(" ").
 		append("\n\n");
@@ -64,7 +60,7 @@ public class ServerChunkBackup {
 				lastTime = System.currentTimeMillis();
 			}
 			if(storedConfirmations.size() >= replicationDegree) {
-				break; //TODO Would it be better to put retries = 5? In terms of performance
+				break;
 			} else {
 				waitTime = waitTime * 2;
 				retries++;
@@ -74,20 +70,29 @@ public class ServerChunkBackup {
 		if(retries >= 5)
 			throw new RemoteException("Cannot backup: Number of retries exceeded");
 		
-		//TODO Keep track of PUTCHUNKS.
-		//  - This should be stored in a file (non-volatile memory)
 		
+		FileChunkData chunkData;
+		if(data == null)
+			chunkData = new FileChunkData(chunkNumber, 0, storedConfirmations.size());
+		else
+			chunkData = new FileChunkData(chunkNumber, data.length, storedConfirmations.size());
+		serverObject.getDb().getBackedUpFileData(fileId).addOrUpdateFileChunkData(chunkData);	
 	}
 	
-	public static void storeChunk(String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh) {
+	public static void storeChunk(ServerObject serverObject, String protocolVersion, int serverId, Multicast mControlCh, Multicast mDataBackupCh) {
 		//Receive chunk
-		//Create file name
+		//Wait a random delay, while checking the replication degree
 		//After random delay (0 - 400 ms)
-		// - On other thread, wait for other stores, to count the replication degree
 		// - Create file
 		// - Write content to file
-
+		// - Send STORED confirmation
+		// - Update peer's database
+		
 		Message chunk = new Message(mDataBackupCh.receive());
+		
+		//Versions not compatible
+		if(!chunk.getVersion().equals(protocolVersion))
+			return;
 		
 		Random randomGenerator = new Random();
 		int delay = randomGenerator.nextInt(maxDelayTime);
@@ -105,28 +110,41 @@ public class ServerChunkBackup {
 			}
 		}
 		
-		if(actualReplicationDegree < Integer.parseInt(chunk.getReplicationDeg())) {
+		//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
+		if(serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(chunk.getReplicationDeg())) {
 			try {
 				String filePath = generateFilePath(chunk.getFileId(), chunk.getChunkNo());
 				FileOutputStream fileStream = new FileOutputStream(filePath);
 				fileStream.write(chunk.getBody());
 				fileStream.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				//TODO Could not write/create file message?
 				e.printStackTrace();
+				return;
 			}
 		}
 		
-		Message stored = chunk;
-		stored.setBodyData(null);
-		stored.setMessageType(MESSAGE_TYPE.STORED);
-		mControlCh.send(stored.generateByteArray());
+		//Creates and sends STORED confirmation message
+		StringBuilder headerBuilder = new StringBuilder("STORED ");
+		headerBuilder.append(protocolVersion).append(" ").
+		append(chunk.getSenderId()).append(" ").
+		append(chunk.getFileId()).append(" ").
+		append(chunk.getChunkNo()).append(" ").
+		append("\n\n");
 		
+		mControlCh.send(headerBuilder.toString().getBytes());
+		
+		//Put fileInfo in the database
+		serverObject.getDb().addStoredFile(chunk.getFileId(), Integer.parseInt(chunk.getReplicationDeg()));
+		FileChunkData chunkData = new FileChunkData(
+				Integer.parseInt(chunk.getChunkNo()), 
+				chunk.getBody().length, 
+				actualReplicationDegree);
+		serverObject.getDb().getStoredFileData(chunk.getFileId()).addOrUpdateFileChunkData(chunkData);
 	}
 	
 	
-	//TODO mudar para serverID/file/chunknum(.file) nao leva o .file, � so para se perceber que � um ficheiro
 	private static String generateFilePath(String fileId, String chunkNum) {
-		return chunkFolder + "/" + fileId + "_" + chunkNum + ".txt";
+		return chunkFolder + "/" + fileId + "_" + chunkNum;
 	}
 }

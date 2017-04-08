@@ -28,20 +28,22 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
-    //TODO backup receives filepath, not filename. Change the things needed
     public void backup(String filePath, int replicationDegree) throws RemoteException, FileNotFoundException, IOException {
     	//Responsavel por
     	// - Chamar o objeto que vai tratar da divisï¿½o do ficheiro/envio
     	// - Guardar a info do objeto na base de dados
 
-    	//Add file info to database table
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-    	Date date = new Date(); //Actual timestamp
+    	Date date = new Date(); //Actual time
     	dateFormat.format(date);
     	
-    	//TODO Como adiciono o ficheiro à DB? Não percebi as funções
-    	this.db.addFileAndDate(filePath, date.toString());
     	String fileId = calculateFileId(filePath, date.toString());
+    	this.db.addBackupFile(filePath, fileId, replicationDegree);
+    	
+    	//If file exists but is outdated
+    	if(this.db.getBackedUpFileId(filePath) != null) {
+    		delete(filePath);
+    	}
     	
     	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
     }
