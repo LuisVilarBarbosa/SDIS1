@@ -1,5 +1,8 @@
 package Project1.Server;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import javax.naming.directory.InvalidAttributesException;
@@ -8,33 +11,30 @@ import javax.naming.directory.InvalidAttributesException;
 
 public class ServerFileBackup {
 	
-	public static void backup(ServerObject serverObject, String fileId, int replicationDegree, byte[] data) throws RemoteException {
+	public static final int CHUNK_MAX_SIZE = 64000;
+	
+	public static void backup(ServerObject serverObject, String filePath, int replicationDegree) throws IOException {
 		//Responsavel por 
+		// - Abrir o ficheiro
 		// - Dividir em chunks
 		// - Criar chunk no e Message
 		// - Chamar o ChunkBackup
 		
 		//1 thread por ficheiro
 		
-		int bytesRead = 0;
+		//Abrir o ficheiro
+		FileInputStream fis = new FileInputStream(filePath);
 		
-		for(long chunkNumber = 0; bytesRead < data.length; chunkNumber++){			
-			//TODO Generate header in ServerChunkBackup
-			StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
-			headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
-			append(serverObject.getServerId()).append(" ").
-			append(fileId).append(" ").
-			append(chunkNumber).append(" ").
-			append(replicationDegree).append(" ").
-			append("\n\n");
+		int bytesRead = CHUNK_MAX_SIZE;
+		
+		for(int chunkNumber = 0; bytesRead < CHUNK_MAX_SIZE; chunkNumber++){			
 			
-			//TODO Verify if this works, or if a ByteArrayOutputStream is needed
-			byte[] chunk = headerBuilder.toString().getBytes();
-			
-			//TODO Import 64kbits from the data array
+			//Import 64kbits from the file
+			byte[] chunkData = null;
+			bytesRead = fis.read(chunkData, 0, CHUNK_MAX_SIZE);
 			
 			//TODO Send data to Chunk Backup
-			ServerChunkBackup.putChunk(serverObject, chunk, replicationDegree, chunkNo);
+			ServerChunkBackup.putChunk(serverObject, filePath, chunkData, replicationDegree, chunkNumber);
 		}
 		
 	}

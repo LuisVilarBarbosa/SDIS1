@@ -23,9 +23,22 @@ public class ServerChunkBackup {
 	
 	//TODO Implement the option to use enhanced protocol, or not. MUST HAVE BOTH VERSIONS
 	
-	public static void putChunk(ServerObject serverObject, byte[] chunk, int replicationDegree) throws RemoteException {
+	public static void putChunk(ServerObject serverObject, String filePath, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
 		Multicast mControlCh = serverObject.getControlChannel();
 		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+		
+		//TODO aqui, o Filepath ja deve vir encriptado
+		
+		StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
+		headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
+		append(serverObject.getServerId()).append(" ").
+		append(filePath).append(" ").
+		append(chunkNumber).append(" ").
+		append(replicationDegree).append(" ").
+		append("\n\n");
+		
+		//TODO Verify if this works, or if a ByteArrayOutputStream is needed
+		byte[] chunk = headerBuilder.toString().getBytes();
 
 		//Send the chunk
 		mDataBackupCh.send(chunk);

@@ -3,6 +3,8 @@ package Project1.Server;
 import Project1.Database.ServerDatabase;
 import Project1.General.SHA256;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -27,21 +29,21 @@ public class ServerObject implements ServerRMI {
     }
 
     //TODO backup receives filepath, not filename. Change the things needed
-    public void backup(String filePath, byte[] data, long size, int replicationDegree) throws RemoteException {
-    	//TODO (EDIT1:BYTE JA GUARDA OS DADOS) criar uma estrutura de dados que guarde tambÃ©m o tamanho dos dados, em vez de byte[] data
+    public void backup(String filePath, int replicationDegree) throws RemoteException, FileNotFoundException, IOException {
+    	//Responsavel por
+    	// - Chamar o objeto que vai tratar da divisï¿½o do ficheiro/envio
+    	// - Guardar a info do objeto na base de dados
 
     	//Add file info to database table
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     	Date date = new Date(); //Actual timestamp
     	dateFormat.format(date);
     	
+    	//TODO Como adiciono o ficheiro à DB? Não percebi as funções
     	this.db.addFileAndDate(filePath, date.toString());
     	String fileId = calculateFileId(filePath);
     	
-    	ServerFileBackup.backup(this, fileId, replicationDegree, data);
-    	//Responsavel por
-    	// - Chamar o objeto que vai tratar da divisï¿½o do ficheiro/envio
-    	// - Guardar a info do objeto na base de dados
+    	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
     }
 
     public void restore(String filePath) throws RemoteException {
