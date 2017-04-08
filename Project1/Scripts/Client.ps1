@@ -2,10 +2,33 @@ cd ..
 cd ..
 echo "Compiling..."
 javac Project1/Client/Client.java Project1/Server/ServerRMI.java
+echo "Almost running..."
+echo "Subprotocols: BACKUP, RESTORE, DELETE, RECLAIM, STATE"
 $subprotocol = Read-Host -Prompt "Subprotocol"
-$filePath = Read-Host -Prompt "File path"
-echo "Running..."
-java Project1/Client/Client localhost:2005 $subprotocol $filePath
+
+if($subprotocol -ieq "BACKUP") {
+    $filePath = Read-Host -Prompt "File path"
+    $replicationDegree = Read-Host -Prompt "Replication degree"
+    java Project1/Client/Client localhost:2005 $subprotocol $filePath $replicationDegree
+}
+elseif($subprotocol -ieq "RESTORE") {
+    $filePath = Read-Host -Prompt "File path"
+    java Project1/Client/Client localhost:2005 $subprotocol $filePath
+}
+elseif($subprotocol -ieq "DELETE") {
+    $filePath = Read-Host -Prompt "File path"
+    java Project1/Client/Client localhost:2005 $subprotocol $filePath
+}
+elseif($subprotocol -ieq "RECLAIM") {
+    $numKBytes = Read-Host -Prompt "Number of KBytes"
+    java Project1/Client/Client localhost:2005 $subprotocol $numKBytes
+}
+elseif($subprotocol -ieq "STATE") {
+    java Project1/Client/Client localhost:2005 $subprotocol
+}
+else {
+    echo "Invalid subprotocol."
+}
 cd Project1/Client
 echo "Removing .class files..."
 rm *.class
