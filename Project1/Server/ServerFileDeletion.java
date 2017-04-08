@@ -1,5 +1,7 @@
 package Project1.Server;
 
+import Project1.Database.ServerDatabase;
+
 import java.io.*;
 
 /* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
@@ -16,7 +18,7 @@ public class ServerFileDeletion {
         mControlCh.send(st.toString().getBytes());
     }
 
-    public static void fileChunksDeleter(String protocolVersion, int serverId, Multicast mControlCh) {
+    public static void fileChunksDeleter(String protocolVersion, int serverId, Multicast mControlCh, ServerDatabase db) {
         while (true) {
                 byte[] request = mControlCh.receive();
                 Message m = new Message(request);
@@ -27,7 +29,10 @@ public class ServerFileDeletion {
                     StringBuilder path = new StringBuilder(serverId);
                     path.append("/").append(fileId);
 
-                    deleteDirectory(new File(path.toString()));
+                    if(!deleteDirectory(new File(path.toString())))
+                        System.err.println("Unable to delete the file '" + fileId + "'. Due to this, maybe there are inconsistencies in its folder (some chunks deleted and others not).");
+
+                    db.removeStoredFile(fileId);
                 }
         }
     }

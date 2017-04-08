@@ -60,10 +60,10 @@ public class ServerDatabase {
             long size = Long.getLong(st.nextToken());
             int perceivedReplicationDegree = Integer.getInteger(st.nextToken());
             DBFileData dbFileData;
-            if ((dbFileData = filesData.get(filePath)) == null)
+            if ((dbFileData = filesData.get(fileId)) == null)
                 dbFileData = new DBFileData(filePath, fileId, desiredReplicationDegree);
             dbFileData.addOrUpdateFileChunkData(new FileChunkData(chunkNo, size, perceivedReplicationDegree));
-            filesData.put(filePath, dbFileData);
+            filesData.put(fileId, dbFileData);
         }
     }
 
@@ -121,31 +121,68 @@ public class ServerDatabase {
         this.storageCapacity = storageCapacity;
     }
 
-    public ArrayList<String> getBackedUpFilesPaths() {
-        return listFilesPaths(backedUpFiles);
+    public ArrayList<String> getBackedUpFilesIds() {
+        return listFilesIds(backedUpFiles);
     }
 
-    public ArrayList<String> getStoredFilesPaths() {
-        return listFilesPaths(storedFiles);
+    public ArrayList<String> getStoredFilesIds() {
+        return listFilesIds(storedFiles);
     }
 
-    private ArrayList<String> listFilesPaths(HashMap<String, DBFileData> filesData) {
-        ArrayList<String> filesPaths = new ArrayList<>();
+    private ArrayList<String> listFilesIds(HashMap<String, DBFileData> filesData) {
+        ArrayList<String> filesIds = new ArrayList<>();
         for (String key : filesData.keySet())
-            filesPaths.add(key);
-        return filesPaths;
+            filesIds.add(key);
+        return filesIds;
     }
 
-    public void removeStoredFile(String filePath) {
-        storedFiles.remove(filePath);
+    public void removeStoredFile(String fileId) {
+        storedFiles.remove(fileId);
     }
 
-    public DBFileData getBackedUpFileData(String filePath) {
-        return backedUpFiles.get(filePath);
+    public DBFileData getBackedUpFileData(String fileId) {
+        return backedUpFiles.get(fileId);
     }
 
-    public DBFileData getStoredFileData(String filePath) {
-        return storedFiles.get(filePath);
+    public DBFileData getStoredFileData(String fileId) {
+        return storedFiles.get(fileId);
+    }
+
+    public long getUsedStorage() {
+        ArrayList<String> storedFilesIds = getStoredFilesIds();
+        int storedFilesIdsSize = storedFilesIds.size();
+        long usedStorage = 0;
+        for(int i = 0; i < storedFilesIdsSize; i++) {
+            DBFileData dbFileData = storedFiles.get(storedFilesIds.get(i));
+            int numFileChunks = dbFileData.getNumFileChunks();
+            for(int j = 0; j < numFileChunks; j++)
+                usedStorage += dbFileData.getFileChunkData(j).getSize();
+        }
+        return usedStorage;
+    }
+
+    public long getFreeStorage() {
+        return storageCapacity - getUsedStorage();
+    }
+
+    public String getBackedUpFileId(String filePath) {
+        ArrayList<String> backedUpFilesIds =  getBackedUpFilesIds();
+        for(int i = 0; i < backedUpFilesIds.size(); i++) {
+            String id = backedUpFilesIds.get(i);
+            if(backedUpFiles.get(id).getFilePath().equals(filePath))
+                return id;
+        }
+        return null;
+    }
+
+    public String getStoredFileId(String filePath) {
+        ArrayList<String> storedFilesIds =  getStoredFilesIds();
+        for(int i = 0; i < storedFilesIds.size(); i++) {
+            String id = storedFilesIds.get(i);
+            if(storedFiles.get(id).getFilePath().equals(filePath))
+                return id;
+        }
+        return null;
     }
 
 }

@@ -39,4 +39,8 @@ public class DBFileData {
         fileChunksData.put(fileChunkData.getChunkNo(), fileChunkData);
     }
 
+    public void removeFileChunkData(int chunkNo) {
+        fileChunksData.remove(chunkNo);
+    }
+
 }

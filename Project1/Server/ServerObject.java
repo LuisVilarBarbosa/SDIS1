@@ -41,24 +41,25 @@ public class ServerObject implements ServerRMI {
     	
     	//TODO Como adiciono o ficheiro à DB? Não percebi as funções
     	this.db.addFileAndDate(filePath, date.toString());
-    	String fileId = calculateFileId(filePath);
+    	String fileId = calculateFileId(filePath, date.toString());
     	
     	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
     }
 
     public void restore(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filePath);
+        String fileId = db.getBackedUpFileId(filePath);
         ServerFileRestore.restore(this, filePath, fileId);
     }
 
     public void delete(String filePath) throws RemoteException {
         // Concurrency is missing
-        String fileId = calculateFileId(filePath);
+        String fileId = db.getBackedUpFileId(filePath);
         ServerFileDeletion.requestDeletion(this, fileId);
     }
 
     public void manageStorage(long newStorageSpace) throws RemoteException {
+        // Concurrency is missing
         ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace);
     }
 
@@ -67,11 +68,10 @@ public class ServerObject implements ServerRMI {
         return ServerState.retrieveState(this);
     }
 
-    private String calculateFileId(String filePath) {
+    private String calculateFileId(String filePath, String lastModificationDate) {
         String fileId = null;
-        String date = db.getDBFileData(filePath).getLastModificationDate();
         try {
-            fileId = SHA256.SHA256(filePath + date);
+            fileId = SHA256.SHA256(filePath + lastModificationDate);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
