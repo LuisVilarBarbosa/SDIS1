@@ -15,16 +15,16 @@ public class ServerState {
         StringBuilder sb = new StringBuilder();
 
         sb.append("Backed up files:\r\n");
-        generatePartialState(db, sb, backedUpFiles, false);
+        generatePartialState(db, sb, backedUpFiles, true, false);
         sb.append("\r\nStored files:\r\n");
-        generatePartialState(db, sb, storedFiles, true);
+        generatePartialState(db, sb, storedFiles, false, true);
 
         sb.append(db.getStorageCapacity()).append(" KBytes\r\n");
         sb.append(db.getUsedStorage()).append(" KBytes\r\n");
         return sb.toString();
     }
 
-    private static void generatePartialState(ServerDatabase db, StringBuilder sb, int filesType, boolean appendSize) {
+    private static void generatePartialState(ServerDatabase db, StringBuilder sb, int filesType, boolean appendFilePath, boolean appendSize) {
         ArrayList<String> filesIds;
         if (filesType == backedUpFiles)
             filesIds = db.getBackedUpFilesIds();
@@ -43,7 +43,8 @@ public class ServerState {
             else // if(filesType == storedFiles)
                 dbFileData = db.getStoredFileData(fileId);
 
-            sb.append("File path: ").append(dbFileData.getFilePath()).append("\r\n");
+            if (appendFilePath)
+                sb.append("File path: ").append(dbFileData.getFilePath()).append("\r\n");
             sb.append("File id: ").append(dbFileData.getFileId()).append("\r\n");
             sb.append("Desired replication degree: ").append(dbFileData.getDesiredReplicationDegree()).append("\r\n");
             sb.append("Chunks (Id, perceived replication degree):").append("\r\n");
