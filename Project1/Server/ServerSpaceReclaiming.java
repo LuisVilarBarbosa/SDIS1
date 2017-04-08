@@ -60,7 +60,7 @@ public class ServerSpaceReclaiming {
 
                 if (m1.getMessageType().equalsIgnoreCase("REMOVED") && m1.getVersion().equalsIgnoreCase(protocolVersion)) {
                     String fileId = m1.getFileId();
-                    int chunkNo = Integer.getInteger(m1.getChunkNo());
+                    int chunkNo = Integer.parseInt(m1.getChunkNo());
 
                     // continue if chunk not stored
                     DBFileData dbFileData = db.getStoredFileData(fileId);

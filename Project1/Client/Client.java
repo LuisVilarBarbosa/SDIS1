@@ -91,7 +91,7 @@ public class Client {
     }
 
     private static void manageServerStorage(ServerRMI serverRMI, String numKBytes) throws RemoteException {
-        serverRMI.manageStorage(Long.getLong(numKBytes));
+        serverRMI.manageStorage(Long.parseLong(numKBytes));
     }
 
     private static void retrieveState(ServerRMI serverRMI) throws RemoteException {

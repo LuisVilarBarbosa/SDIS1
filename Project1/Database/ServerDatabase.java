@@ -9,7 +9,7 @@ public class ServerDatabase {
     private static final String dbFilename = "database.txt";
     private static final String delim = "|";
     private final String dbPath;
-    private long storageCapacity;    // KBytes
+    private long storageCapacity = 1000000;    // KBytes (default defined for the first use)
     private HashMap<String, DBFileData> backedUpFiles = new HashMap<>();    // backed up to other peers
     private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData> 
 
@@ -21,7 +21,7 @@ public class ServerDatabase {
             BufferedReader file = new BufferedReader(isr);
 
             String line = file.readLine();
-            storageCapacity = Integer.getInteger(line);
+            storageCapacity = Long.parseLong(line);
             file.readLine();    // empty line
             file.readLine();    // 'Backed up files:' line
             loadDatabase(file, backedUpFiles);
@@ -55,10 +55,10 @@ public class ServerDatabase {
             StringTokenizer st = new StringTokenizer(line, delim);
             String filePath = st.nextToken();
             String fileId = st.nextToken();
-            int desiredReplicationDegree = Integer.getInteger(st.nextToken());
-            int chunkNo = Integer.getInteger(st.nextToken());
-            long size = Long.getLong(st.nextToken());
-            int perceivedReplicationDegree = Integer.getInteger(st.nextToken());
+            int desiredReplicationDegree = Integer.parseInt(st.nextToken());
+            int chunkNo = Integer.parseInt(st.nextToken());
+            long size = Long.parseLong(st.nextToken());
+            int perceivedReplicationDegree = Integer.parseInt(st.nextToken());
             DBFileData dbFileData;
             if ((dbFileData = filesData.get(fileId)) == null)
                 dbFileData = new DBFileData(filePath, fileId, desiredReplicationDegree);
