@@ -129,13 +129,12 @@ public class ServerDatabase {
             for (int chunkNo : chunksNos) {
                 FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
                 StringBuilder st = new StringBuilder();
-                st.append(delim).append(filePath);
-                st.append(delim).append(fileId);
-                st.append(delim).append(desiredReplicationDegree);
-                st.append(delim).append(fileChunkData.getChunkNo());
-                st.append(delim).append(fileChunkData.getSize());
-                st.append(delim).append(fileChunkData.getPerceivedReplicationDegree());
-                st.append("\r\n");
+                st.append(filePath).append(delim);
+                st.append(fileId).append(delim);
+                st.append(desiredReplicationDegree).append(delim);
+                st.append(fileChunkData.getChunkNo()).append(delim);
+                st.append(fileChunkData.getSize()).append(delim);
+                st.append(fileChunkData.getPerceivedReplicationDegree()).append("\r\n");
                 file.write(st.toString());
             }
         }
@@ -178,13 +177,12 @@ public class ServerDatabase {
 
     public long getUsedStorage() {
         ArrayList<String> storedFilesIds = getStoredFilesIds();
-        int storedFilesIdsSize = storedFilesIds.size();
         long usedStorage = 0;
-        for(int i = 0; i < storedFilesIdsSize; i++) {
-            DBFileData dbFileData = storedFiles.get(storedFilesIds.get(i));
-            int numFileChunks = dbFileData.getNumFileChunks();
-            for(int j = 0; j < numFileChunks; j++)
-                usedStorage += dbFileData.getFileChunkData(j).getSize();
+        for(String storedFilesId : storedFilesIds) {
+            DBFileData dbFileData = storedFiles.get(storedFilesId);
+            ArrayList<Integer> chunksNos = dbFileData.listChunksNos();
+            for (int chunkNo : chunksNos)
+                usedStorage += dbFileData.getFileChunkData(chunkNo).getSize();
         }
         return usedStorage;
     }
