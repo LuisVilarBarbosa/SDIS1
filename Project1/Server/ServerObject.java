@@ -45,6 +45,7 @@ public class ServerObject implements ServerRMI {
     		delete(filePath);
     	}
     	
+    	//TODO IF fails, then delete file from DB
     	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
     }
 
@@ -82,8 +83,8 @@ public class ServerObject implements ServerRMI {
 
     public String getProtocolVersion(){ return protocolVersion; }
     public int getServerId() { return serverId; }
-    public Multicast getControlChannel() { return mControlCh; }
-    public Multicast getDataBackupChannel() { return mDataBackupCh; }
-    public Multicast getDataRecoveryChannel() { return mDataRecoveryCh; }
+    public Multicast getControlChannel() throws CloneNotSupportedException { return (Multicast) mControlCh.clone(); }
+    public Multicast getDataBackupChannel() throws CloneNotSupportedException { return (Multicast) mDataBackupCh.clone(); }
+    public Multicast getDataRecoveryChannel() throws CloneNotSupportedException { return (Multicast) mDataRecoveryCh.clone(); }
     public ServerDatabase getDb() { return db; }
 }

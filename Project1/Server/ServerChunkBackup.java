@@ -20,8 +20,16 @@ public class ServerChunkBackup {
 	//Is this on this level, or higher?
 	
 	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
-		Multicast mControlCh = serverObject.getControlChannel();
-		Multicast mDataBackupCh = serverObject.getDataBackupChannel();	
+		Multicast mControlCh;
+		Multicast mDataBackupCh;
+		try {
+			mControlCh = serverObject.getControlChannel();
+			mDataBackupCh = serverObject.getDataBackupChannel();
+		} catch (CloneNotSupportedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		}
 		
 		StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
 		headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
@@ -87,8 +95,16 @@ public class ServerChunkBackup {
 		// - Update peer's database
 		String protocolVersion = serverObject.getProtocolVersion();
 		int serverId = serverObject.getServerId();	// not used, but should be used to send STORED message
-		Multicast mControlCh = serverObject.getControlChannel();
-		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+		Multicast mControlCh;
+		Multicast mDataBackupCh;
+		try {
+			mControlCh = serverObject.getControlChannel();
+			mDataBackupCh = serverObject.getDataBackupChannel();
+		} catch (CloneNotSupportedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		}
 
 		
 		Message chunk = new Message(mDataBackupCh.receive());

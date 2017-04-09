@@ -13,7 +13,14 @@ public class ServerFileDeletion {
     public static void requestDeletion(ServerObject serverObject, String fileId) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mControlCh;
+		try {
+			mControlCh = serverObject.getControlChannel();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
 
         StringBuilder st = new StringBuilder("DELETE ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
@@ -23,7 +30,14 @@ public class ServerFileDeletion {
     public static void fileChunksDeleter(ServerObject serverObject) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mControlCh;
+		try {
+			mControlCh = serverObject.getControlChannel();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
         ServerDatabase db = serverObject.getDb();
 
         while (true) {

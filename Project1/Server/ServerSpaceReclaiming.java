@@ -51,7 +51,14 @@ public class ServerSpaceReclaiming {
     public static void monitorStorageSpaceChanges(ServerObject serverObject) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mControlCh;
+		try {
+			mControlCh = serverObject.getControlChannel();
+		} catch (CloneNotSupportedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return;
+		}
         ServerDatabase db = serverObject.getDb();
 
         while (true) {
