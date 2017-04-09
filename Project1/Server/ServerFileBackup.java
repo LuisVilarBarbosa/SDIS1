@@ -24,7 +24,7 @@ public class ServerFileBackup {
 				System.out.println("Chunk number:" + chunkNumber);
 
 				//Send data to Chunk Backup
-				if (bytesRead != Constants.maxChunkSize)
+				if (bytesRead > 0 && bytesRead != Constants.maxChunkSize)
 					chunkData = Arrays.copyOf(chunkData, bytesRead);
 				ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
 			}
