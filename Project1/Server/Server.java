@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -50,7 +51,7 @@ public class Server {
         try {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
-            Registry r = LocateRegistry.createRegistry(1099);   // default port
+            Registry r = LocateRegistry.createRegistry(1024 + new Random().nextInt(64512));
         	
 	        Timer timer1 = new Timer();
 	        TimerTask timerTask1 = new TimerTask() {
