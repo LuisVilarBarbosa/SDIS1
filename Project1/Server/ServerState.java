@@ -47,7 +47,10 @@ public class ServerState {
                 sb.append("File path: ").append(dbFileData.getFilePath()).append("\r\n");
             sb.append("File id: ").append(dbFileData.getFileId()).append("\r\n");
             sb.append("Desired replication degree: ").append(dbFileData.getDesiredReplicationDegree()).append("\r\n");
-            sb.append("Chunks (id, perceived replication degree):").append("\r\n");
+            if (appendSize)
+                sb.append("Chunks (id, size (KB), perceived replication degree):").append("\r\n");
+            else
+                sb.append("Chunks (id, perceived replication degree):").append("\r\n");
 
             ArrayList<Integer> chunksNos = dbFileData.listChunksNos();
             for (int chunkNo : chunksNos) {
