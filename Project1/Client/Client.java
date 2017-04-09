@@ -57,7 +57,7 @@ public class Client {
         
 
         try {
-            Registry r = LocateRegistry.getRegistry(peerHostName);
+            Registry r = LocateRegistry.getRegistry(peerHostName, Integer.parseInt(peerRemoteObjName));    // port defined by 'peerRemoteObjName'
             ServerRMI serverRMI = (ServerRMI) r.lookup(peerRemoteObjName);
 
             if (subProtocol.equalsIgnoreCase("BACKUP"))
