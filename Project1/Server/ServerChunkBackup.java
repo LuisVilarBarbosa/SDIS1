@@ -20,6 +20,10 @@ public class ServerChunkBackup {
 	//Is this on this level, or higher?
 	
 	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
+		if(data == null) {
+			System.err.println("PutChunk : data = null not accepted.");
+			return;
+		}
 		Multicast mControlCh;
 		Multicast mDataBackupCh;
 		try {
@@ -37,18 +41,18 @@ public class ServerChunkBackup {
 		append(fileId).append(" ").
 		append(chunkNumber).append(" ").
 		append(replicationDegree).append(" ").
-		append("\n\n");
+		append("\r\n");
 		
 		//TODO Verify if this works, or if a ByteArrayOutputStream is needed
-		byte[] chunk = headerBuilder.toString().getBytes();
+		byte[] header = headerBuilder.toString().getBytes();
 
 		//Send the chunk
-		mDataBackupCh.send(chunk);
+		mDataBackupCh.send(header);
 		
 		//Wait in the control channel for STORED messages
 		// - Count number of STORED's received in 1 sec
 		// - IF not enough THEN retransmits 2x waiting_time(1 sec) (after 5 times -> error)
-		ArrayList<byte[]> storedConfirmations = new ArrayList<byte[]>();
+		ArrayList<byte[]> storedConfirmations = new ArrayList<>();
 		int waitTime = Constants.maxWaitTime;
 		int retries = 0;
 		long lastTime = System.currentTimeMillis();
@@ -77,12 +81,8 @@ public class ServerChunkBackup {
 			throw new RemoteException("Cannot backup: Number of retries exceeded");
 		
 		
-		FileChunkData chunkData;
-		if(data == null)
-			chunkData = new FileChunkData(chunkNumber, 0, storedConfirmations.size());
-		else
-			chunkData = new FileChunkData(chunkNumber, data.length, storedConfirmations.size());
-		serverObject.getDb().getBackedUpFileData(fileId).addOrUpdateFileChunkData(chunkData);	
+		FileChunkData chunkData = new FileChunkData(chunkNumber, data.length, storedConfirmations.size());
+		serverObject.getDb().getBackedUpFileData(fileId).addOrUpdateFileChunkData(chunkData);
 	}
 	
 	public static void storeChunk(ServerObject serverObject) {
@@ -93,73 +93,73 @@ public class ServerChunkBackup {
 		// - Write content to file
 		// - Send STORED confirmation
 		// - Update peer's database
-		String protocolVersion = serverObject.getProtocolVersion();
-		int serverId = serverObject.getServerId();	// not used, but should be used to send STORED message
-		Multicast mControlCh;
-		Multicast mDataBackupCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-			mDataBackupCh = serverObject.getDataBackupChannel();
-		} catch (CloneNotSupportedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
 
-		
-		Message chunk = new Message(mDataBackupCh.receive());
-		
-		//Versions not compatible
-		if(!chunk.getVersion().equals(protocolVersion))
-			return;
-		
-		Random randomGenerator = new Random();
-		int delay = randomGenerator.nextInt(Constants.maxDelayTime);
-		long delayEnding = System.currentTimeMillis() + delay;
-		int actualReplicationDegree = 0;
-		
-		//During delay time, checks how many replicas of the chunk have been stored in other peers
-		while(System.currentTimeMillis() < delayEnding) {
+		while (true) {
+			String protocolVersion = serverObject.getProtocolVersion();
+			int serverId = serverObject.getServerId();    // not used, but should be used to send STORED message
+			Multicast mControlCh;
+			Multicast mDataBackupCh;
 			try {
-				Message storeConfirmation = new Message(mControlCh.receive(delay));
-				if(storeConfirmation.getChunkNo() == chunk.getChunkNo())
-					actualReplicationDegree++;
-			} catch (SocketException e) {
-				break;
-			}
-		}
-		
-		//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
-		if(serverObject.getProtocolVersion().equals(protocolVersion) || actualReplicationDegree < Integer.parseInt(chunk.getReplicationDeg())) {
-			try {
-				String filePath = Paths.getChunkPath(serverId, chunk.getFileId(), Integer.parseInt(chunk.getChunkNo()));
-				FileOutputStream fileStream = new FileOutputStream(filePath);
-				fileStream.write(chunk.getBody());
-				fileStream.close();
-			} catch (IOException e) {
-				//TODO Could not write/create file message?
-				e.printStackTrace();
+				mControlCh = serverObject.getControlChannel();
+				mDataBackupCh = serverObject.getDataBackupChannel();
+			} catch (CloneNotSupportedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 				return;
 			}
+
+			Message m = new Message(mDataBackupCh.receive());
+
+			if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
+				Random randomGenerator = new Random();
+				int delay = randomGenerator.nextInt(Constants.maxDelayTime);
+				long delayEnding = System.currentTimeMillis() + delay;
+				int actualReplicationDegree = 0;
+
+				//During delay time, checks how many replicas of the chunk have been stored in other peers
+				while (System.currentTimeMillis() < delayEnding) {
+					try {
+						Message storeConfirmation = new Message(mControlCh.receive(delay));
+						if (storeConfirmation.getChunkNo() == m.getChunkNo())
+							actualReplicationDegree++;
+					} catch (SocketException e) {
+						break;
+					}
+				}
+
+				//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
+				if (serverObject.getProtocolVersion().equals(protocolVersion) || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())) {
+					try {
+						String filePath = Paths.getChunkPath(serverId, m.getFileId(), Integer.parseInt(m.getChunkNo()));
+						FileOutputStream fileStream = new FileOutputStream(filePath);
+						fileStream.write(m.getBody());
+						fileStream.close();
+					} catch (IOException e) {
+						//TODO Could not write/create file message?
+						e.printStackTrace();
+						return;
+					}
+				}
+
+				//Creates and sends STORED confirmation message
+				StringBuilder headerBuilder = new StringBuilder("STORED ");
+				headerBuilder.append(protocolVersion).append(" ").
+						append(serverId).append(" ").
+						append(m.getFileId()).append(" ").
+						append(m.getChunkNo()).append(" ").
+						append("\r\n");
+
+				mControlCh.send(headerBuilder.toString().getBytes());
+
+				//Put fileInfo in the database
+				serverObject.getDb().addStoredFile(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
+				FileChunkData chunkData = new FileChunkData(
+						Integer.parseInt(m.getChunkNo()),
+						m.getBody().length,
+						actualReplicationDegree);
+				serverObject.getDb().getStoredFileData(m.getFileId()).addOrUpdateFileChunkData(chunkData);
+			}
 		}
-		
-		//Creates and sends STORED confirmation message
-		StringBuilder headerBuilder = new StringBuilder("STORED ");
-		headerBuilder.append(protocolVersion).append(" ").
-		append(chunk.getSenderId()).append(" ").
-		append(chunk.getFileId()).append(" ").
-		append(chunk.getChunkNo()).append(" ").
-		append("\n\n");
-		
-		mControlCh.send(headerBuilder.toString().getBytes());
-		
-		//Put fileInfo in the database
-		serverObject.getDb().addStoredFile(chunk.getFileId(), Integer.parseInt(chunk.getReplicationDeg()));
-		FileChunkData chunkData = new FileChunkData(
-				Integer.parseInt(chunk.getChunkNo()), 
-				chunk.getBody().length, 
-				actualReplicationDegree);
-		serverObject.getDb().getStoredFileData(chunk.getFileId()).addOrUpdateFileChunkData(chunkData);
 	}
 
 }

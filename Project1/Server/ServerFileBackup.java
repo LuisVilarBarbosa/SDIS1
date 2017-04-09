@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 
@@ -22,18 +23,17 @@ public class ServerFileBackup {
 		
 		//Abrir o ficheiro
 		FileInputStream fis = new FileInputStream(filePath);
-		
+
 		int bytesRead = Constants.maxChunkSize;
-		System.out.println("\n");
-		
+
 		for(int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++){
-			
-			//Import 64kbits from the file
 			byte[] chunkData = new byte[Constants.maxChunkSize];
-			bytesRead = fis.read(chunkData, 0, Constants.maxChunkSize);
+			bytesRead = fis.read(chunkData);
 			System.out.println("Chunk number:" + chunkNumber);
-	
+
 			//Send data to Chunk Backup
+			if(bytesRead != Constants.maxChunkSize)
+				chunkData = Arrays.copyOf(chunkData, bytesRead);
 			ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
 		}
 		

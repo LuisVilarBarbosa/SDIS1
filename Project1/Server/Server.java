@@ -51,8 +51,9 @@ public class Server {
         try {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
-            //Registry r = LocateRegistry.createRegistry(1024 + new Random().nextInt(64512));
-            Registry r = LocateRegistry.createRegistry(1099);	
+
+            Registry r = LocateRegistry.createRegistry(Integer.parseInt(remoteObjName));    // port defined by 'remoteObjName'
+
         	
 	        Timer timer1 = new Timer();
 	        TimerTask timerTask1 = new TimerTask() {
