@@ -147,7 +147,7 @@ public class ServerChunkBackup {
 				//Put fileInfo in the database
 				FileChunkData chunkData = new FileChunkData(
 						Integer.parseInt(m.getChunkNo()),
-						m.getBody().length,
+						m.getBody().length / 1000,	// chunk size in KBytes
 						actualReplicationDegree);
 				DBFileData dbFileData = db.getStoredFileData(m.getFileId());
 				if(dbFileData == null) {
