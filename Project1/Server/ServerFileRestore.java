@@ -18,10 +18,12 @@ public class ServerFileRestore {
             }
 
         File file = new File(folderPath);
-        if(file.mkdirs())
-            System.out.println("Restore: '" + folderPath + "' directory successfully created.");
-        else
-            System.out.println("Restore: error creating the directory '" + folderPath + "'");
+        if(!file.exists()) {
+            if (file.mkdirs())
+                System.out.println("Restore: '" + folderPath + "' directory successfully created.");
+            else
+                System.out.println("Restore: error creating the directory '" + folderPath + "'");
+        }
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
