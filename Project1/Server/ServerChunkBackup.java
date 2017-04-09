@@ -99,6 +99,9 @@ public class ServerChunkBackup {
 
 		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
+			//To avoid receiving messages from himself
+			if(Integer.parseInt(m.getSenderId()) == serverObject.getServerId())
+				continue;
 
 			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
 				Random randomGenerator = new Random();
