@@ -117,7 +117,7 @@ public class ServerChunkBackup {
 				}
 
 				//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
-				if (serverObject.getProtocolVersion().equals(protocolVersion) || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())) {
+				if (serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())) {
 					try {
 						String filePath = Paths.getChunkPath(serverId, m.getFileId(), Integer.parseInt(m.getChunkNo()));
 						FileOutputStream fileStream = new FileOutputStream(filePath);
