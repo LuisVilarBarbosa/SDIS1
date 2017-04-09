@@ -30,8 +30,7 @@ public class ServerChunkBackup {
 		append(serverObject.getServerId()).append(" ").
 		append(fileId).append(" ").
 		append(chunkNumber).append(" ").
-		append(replicationDegree).append(" ").
-		append("\r\n\r\n");
+		append(replicationDegree).append("\r\n\r\n");
 
 		byte[] header = headerBuilder.toString().getBytes();
 		byte[] chunk = new byte[header.length + data.length];
@@ -99,7 +98,7 @@ public class ServerChunkBackup {
 		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
 
-			if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
+			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
 				Random randomGenerator = new Random();
 				int delay = randomGenerator.nextInt(Constants.maxDelayTime);
 				long delayEnding = System.currentTimeMillis() + delay;
@@ -108,8 +107,8 @@ public class ServerChunkBackup {
 				//During delay time, checks how many replicas of the chunk have been stored in other peers
 				while (System.currentTimeMillis() < delayEnding) {
 					try {
-						Message storeConfirmation = new Message(mControlCh.receive(delay));
-						if (storeConfirmation.getChunkNo() == m.getChunkNo())
+						byte[] msg = mControlCh.receive(delay);
+						if (msg != null && new Message(msg).getChunkNo() == m.getChunkNo())
 							actualReplicationDegree++;
 					} catch (SocketException e) {
 						break;
@@ -135,8 +134,7 @@ public class ServerChunkBackup {
 				headerBuilder.append(protocolVersion).append(" ").
 						append(serverId).append(" ").
 						append(m.getFileId()).append(" ").
-						append(m.getChunkNo()).append(" ").
-						append("\r\n\r\n");
+						append(m.getChunkNo()).append("\r\n\r\n");
 
 				mControlCh.send(headerBuilder.toString().getBytes());
 
