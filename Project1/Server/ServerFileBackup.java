@@ -1,13 +1,13 @@
 package Project1.Server;
 
+import Project1.General.Constants;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 
 public class ServerFileBackup {
-	
-	public static final int CHUNK_MAX_SIZE = 64000;
 	
 	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) throws IOException {
 		//Responsavel por 
@@ -21,13 +21,13 @@ public class ServerFileBackup {
 		//Abrir o ficheiro
 		FileInputStream fis = new FileInputStream(filePath);
 		
-		int bytesRead = CHUNK_MAX_SIZE;
+		int bytesRead = Constants.maxChunkSize;
 		
-		for(int chunkNumber = 0; bytesRead < CHUNK_MAX_SIZE; chunkNumber++){			
+		for(int chunkNumber = 0; bytesRead < Constants.maxChunkSize; chunkNumber++){
 			
 			//Import 64kbits from the file
 			byte[] chunkData = null;
-			bytesRead = fis.read(chunkData, 0, CHUNK_MAX_SIZE);
+			bytesRead = fis.read(chunkData, 0, Constants.maxChunkSize);
 			
 			//Send data to Chunk Backup
 			ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);

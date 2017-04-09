@@ -15,8 +15,6 @@ public class Message {
     private static final int SM_CR2 = 3;
     private static final int SM_LF2 = 4;
     
-    public static final int CHUNK_MAX_SIZE = 64000;
-    
     private String messageType; //8 characters
     private String version; // <n>.<m> -> 3 characters
     private String senderId;    // Not negative integer

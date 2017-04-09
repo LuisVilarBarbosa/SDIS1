@@ -1,6 +1,7 @@
 package Project1.Server;
 
 import Project1.Database.ServerDatabase;
+import Project1.General.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -13,8 +14,6 @@ import java.util.Random;
 /* Generic message to send: CHUNK <Version> <SenderId> <FileId> <ChunkNo> <CRLF><CRLF><Body> */
 
 public class ServerChunkRestore {
-    private static final int maxWaitTime = 400; /* milliseconds */
-    public static int chunkSize = 64000;
 
     public static byte[] requestChunk(ServerObject serverObject, String fileId, int chunkNo) {
         String protocolVersion = serverObject.getProtocolVersion();
@@ -27,7 +26,7 @@ public class ServerChunkRestore {
         mControlCh.send(st.toString().getBytes());
 
         try {
-            byte[] data = mDataRecoveryCh.receive(1000);
+            byte[] data = mDataRecoveryCh.receive(Constants.maxWaitTime);
             Message m = new Message(data);
             return m.getBody();
         } catch (SocketException e) {
@@ -42,14 +41,14 @@ public class ServerChunkRestore {
         Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
         ServerDatabase db = serverObject.getDb();
 
-        byte[] data = new byte[chunkSize];
+        byte[] data = new byte[Constants.maxChunkSize];
         while (true) {
             try {
                 byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
 
                 //Notification that other server has attended the request first
-                byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt() % maxWaitTime);
+                byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt() % Constants.maxDelayTime);
 
                 if(request2 != null) {
                     Message m2 = new Message(request2);

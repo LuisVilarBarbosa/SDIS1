@@ -8,15 +8,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import Project1.Database.FileChunkData;
+import Project1.General.Constants;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 /* Generic message to send: STORED <Version> <SenderId> <FileId> <ChunkNo> <CRLF><CRLF> */
 
 public class ServerChunkBackup {
-	private static final int maxWaitTime = 1000; /* milliseconds */
-	private static final int maxDelayTime = 400;
 	private static final String chunkFolder = "/chunks";
-	
 	
 	//TODO Create a different Multicast object for each thread
 	//Is this on this level, or higher?
@@ -43,7 +41,7 @@ public class ServerChunkBackup {
 		// - Count number of STORED's received in 1 sec
 		// - IF not enough THEN retransmits 2x waiting_time(1 sec) (after 5 times -> error)
 		ArrayList<byte[]> storedConfirmations = new ArrayList<byte[]>();
-		int waitTime = maxWaitTime;
+		int waitTime = Constants.maxWaitTime;
 		int retries = 0;
 		long lastTime = System.currentTimeMillis();
 		long elapsedTime = 0;
@@ -100,7 +98,7 @@ public class ServerChunkBackup {
 			return;
 		
 		Random randomGenerator = new Random();
-		int delay = randomGenerator.nextInt(maxDelayTime);
+		int delay = randomGenerator.nextInt(Constants.maxDelayTime);
 		long delayEnding = System.currentTimeMillis() + delay;
 		int actualReplicationDegree = 0;
 		
