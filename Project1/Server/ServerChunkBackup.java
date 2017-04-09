@@ -3,7 +3,6 @@ package Project1.Server;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,6 +23,7 @@ public class ServerChunkBackup {
 			System.err.println("PutChunk : data = null not accepted.");
 			return;
 		}
+		String protocolVersion = serverObject.getProtocolVersion();
 		Multicast mControlCh = serverObject.getControlChannel();
 		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
 		
@@ -33,10 +33,12 @@ public class ServerChunkBackup {
 		append(fileId).append(" ").
 		append(chunkNumber).append(" ").
 		append(replicationDegree).append(" ").
-		append("\r\n");
-		
-		//TODO Verify if this works, or if a ByteArrayOutputStream is needed
+		append("\r\n\r\n");
+
 		byte[] header = headerBuilder.toString().getBytes();
+		byte[] chunk = new byte[Constants.maxMessageSize];
+		System.arraycopy(header, 0, chunk, 0, header.length);
+		System.arraycopy(data, 0, chunk, header.length, data.length);
 
 		//Send the chunk
 		mDataBackupCh.send(header);
@@ -44,7 +46,7 @@ public class ServerChunkBackup {
 		//Wait in the control channel for STORED messages
 		// - Count number of STORED's received in 1 sec
 		// - IF not enough THEN retransmits 2x waiting_time(1 sec) (after 5 times -> error)
-		ArrayList<byte[]> storedConfirmations = new ArrayList<>();
+		ArrayList<Message> storedConfirmations = new ArrayList<>();
 		int waitTime = Constants.maxWaitTime;
 		int retries = 0;
 		long lastTime = System.currentTimeMillis();
@@ -53,7 +55,9 @@ public class ServerChunkBackup {
 		{
 			while(elapsedTime < waitTime) {
 				try {
-					storedConfirmations.add(mControlCh.receive(waitTime));
+					Message m = new Message(mControlCh.receive(waitTime));
+					if(m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
+						storedConfirmations.add(m);
 				} catch (SocketException e) {
 					break;
 				}
@@ -130,7 +134,7 @@ public class ServerChunkBackup {
 						append(serverId).append(" ").
 						append(m.getFileId()).append(" ").
 						append(m.getChunkNo()).append(" ").
-						append("\r\n");
+						append("\r\n\r\n");
 
 				mControlCh.send(headerBuilder.toString().getBytes());
 
