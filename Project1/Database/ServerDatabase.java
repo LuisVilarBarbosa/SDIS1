@@ -74,7 +74,11 @@ public class ServerDatabase {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                saveDatabase();
+                try {
+                    saveDatabase();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
             }
         };
         timer.schedule(timerTask, 0, updateFilePeriod);
@@ -84,7 +88,11 @@ public class ServerDatabase {
         return new Thread() {
             @Override
             public void run() {
-                saveDatabase();
+                try {
+                    saveDatabase();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
