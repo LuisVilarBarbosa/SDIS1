@@ -9,11 +9,19 @@ import java.io.IOException;
 public class ServerFileRestore {
 
     public static void restore(ServerObject serverObject, String filePath, String fileId) {
-        File file = new File(filePath);
+
+        String folderPath = null;
+        for(int i = filePath.length() - 1; i >= 0; i--)
+            if(filePath.charAt(i) == '/' || filePath.charAt(i) == '\\') {
+                folderPath = filePath.substring(0, i - 1);
+                break;
+            }
+
+        File file = new File(folderPath);
         if(file.mkdirs())
-            System.out.println("Restore: '" + filePath + "' directory successfully created.");
+            System.out.println("Restore: '" + folderPath + "' directory successfully created.");
         else
-            System.out.println("Restore: error creating the directory '" + filePath + "'");
+            System.out.println("Restore: error creating the directory '" + folderPath + "'");
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
