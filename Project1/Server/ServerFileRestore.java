@@ -13,7 +13,7 @@ public class ServerFileRestore {
         String folderPath = null;
         for(int i = filePath.length() - 1; i >= 0; i--)
             if(filePath.charAt(i) == '/' || filePath.charAt(i) == '\\') {
-                folderPath = filePath.substring(0, i - 1);
+                folderPath = filePath.substring(0, i);
                 break;
             }
 
