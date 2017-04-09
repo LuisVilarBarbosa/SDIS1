@@ -1,11 +1,12 @@
 package Project1.Database;
 
+import Project1.General.Paths;
+
 import java.io.*;
 import java.util.*;
 
 public class ServerDatabase {
     private static final int updateFilePeriod = 10000;  // milliseconds
-    private static final String dbFilename = "database.txt";
     private static final String delim = "|";
     private final String dbPath;
     private long storageCapacity = 1000000;    // KBytes (default defined for the first use)
@@ -13,7 +14,7 @@ public class ServerDatabase {
     private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData>
 
     public ServerDatabase(int serverId) {
-        dbPath = serverId + "/" + dbFilename;
+        dbPath = Paths.getDatabasePath(serverId);
         try {
             FileInputStream fis = new FileInputStream(dbPath);
             InputStreamReader isr = new InputStreamReader(fis);
@@ -32,7 +33,7 @@ public class ServerDatabase {
             fis.close();
         } catch (FileNotFoundException e) {
             System.out.println("Building new database.");
-            File folder = new File(Integer.toString(serverId));
+            File folder = new File(Paths.getDatabaseFolder(serverId));
             folder.mkdirs();
             File file = new File(dbPath);
             try {
