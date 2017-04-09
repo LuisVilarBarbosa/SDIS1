@@ -23,11 +23,11 @@ public class ServerFileBackup {
 		
 		int bytesRead = Constants.maxChunkSize;
 		
-		for(int chunkNumber = 0; bytesRead < Constants.maxChunkSize; chunkNumber++){
+		for(int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++){
 			
 			//Import 64kbits from the file
 			byte[] chunkData = null;
-			bytesRead = fis.read(chunkData, 0, Constants.maxChunkSize);
+			bytesRead = fis.read(chunkData, bytesRead, Constants.maxChunkSize);
 			
 			//Send data to Chunk Backup
 			ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);

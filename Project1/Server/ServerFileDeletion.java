@@ -1,8 +1,10 @@
 package Project1.Server;
 
 import Project1.Database.ServerDatabase;
+import Project1.General.Paths;
 
 import java.io.*;
+import java.util.regex.Pattern;
 
 /* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
 
@@ -31,10 +33,9 @@ public class ServerFileDeletion {
                 if (m.getMessageType().equalsIgnoreCase("DELETE") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
                     String fileId = m.getFileId();
 
-                    StringBuilder path = new StringBuilder(serverId);
-                    path.append("/").append(fileId);
+                    String path = Paths.getFolderPath(serverId, fileId);
 
-                    if(!deleteDirectory(new File(path.toString())))
+                    if(!deleteDirectory(new File(path)))
                         System.err.println("Unable to delete the file '" + fileId + "'. Due to this, maybe there are inconsistencies in its folder (some chunks deleted and others not).");
 
                     db.removeStoredFile(fileId);

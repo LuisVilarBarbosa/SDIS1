@@ -1,5 +1,7 @@
 package Project1.Server;
 
+import Project1.General.Constants;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +24,7 @@ public class ServerFileRestore {
                 data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
                 fileOutputStream.write(data);
                 chunkNo++;
-            } while (data.length == ServerChunkRestore.chunkSize);
+            } while (data.length == Constants.maxChunkSize);
 
             fileOutputStream.close();
         } catch (IOException e) {

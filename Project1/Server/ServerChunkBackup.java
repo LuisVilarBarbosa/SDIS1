@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import Project1.Database.FileChunkData;
+import Project1.General.Paths;
 import Project1.General.Constants;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 /* Generic message to send: STORED <Version> <SenderId> <FileId> <ChunkNo> <CRLF><CRLF> */
 
 public class ServerChunkBackup {
-	private static final String chunkFolder = "/chunks";
 	
 	//TODO Create a different Multicast object for each thread
 	//Is this on this level, or higher?
@@ -114,9 +114,9 @@ public class ServerChunkBackup {
 		}
 		
 		//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
-		if(serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(chunk.getReplicationDeg())) {
+		if(serverObject.getProtocolVersion().equals(protocolVersion) || actualReplicationDegree < Integer.parseInt(chunk.getReplicationDeg())) {
 			try {
-				String filePath = generateFilePath(chunk.getFileId(), chunk.getChunkNo());
+				String filePath = Paths.getChunkPath(serverId, chunk.getFileId(), Integer.parseInt(chunk.getChunkNo()));
 				FileOutputStream fileStream = new FileOutputStream(filePath);
 				fileStream.write(chunk.getBody());
 				fileStream.close();
@@ -145,9 +145,5 @@ public class ServerChunkBackup {
 				actualReplicationDegree);
 		serverObject.getDb().getStoredFileData(chunk.getFileId()).addOrUpdateFileChunkData(chunkData);
 	}
-	
-	
-	private static String generateFilePath(String fileId, String chunkNum) {
-		return chunkFolder + "/" + fileId + "_" + chunkNum;
-	}
+
 }

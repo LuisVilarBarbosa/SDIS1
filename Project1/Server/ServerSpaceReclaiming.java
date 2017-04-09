@@ -5,6 +5,8 @@ package Project1.Server;
 import Project1.Database.DBFileData;
 import Project1.Database.FileChunkData;
 import Project1.Database.ServerDatabase;
+import Project1.General.Constants;
+import Project1.General.Paths;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +32,7 @@ public class ServerSpaceReclaiming {
 
             for (int chunkNo = 0; chunkNo < numFileChunks && usedStorage > newStorageSpace; chunkNo++) {
                 // delete file from the file system
-                StringBuilder path = new StringBuilder(serverId);
-                path.append("/").append(fileId).append("/").append(chunkNo);
+                String path = Paths.getChunkPath(serverId, fileId, chunkNo);
                 new File(path.toString()).delete();
 
                 // delete file from the database
@@ -75,7 +76,7 @@ public class ServerSpaceReclaiming {
 
                     //Notification that other server has attended the request first
                     byte[] info2 = null;
-                    mControlCh.receive(new Random().nextInt() % 400);
+                    mControlCh.receive(new Random().nextInt() % Constants.maxDelayTime);
                     Message m2 = new Message(info2);
                     if (m2.getMessageType().equalsIgnoreCase("PUTCHUNK") &&
                             m2.getVersion().equalsIgnoreCase(protocolVersion) &&
@@ -86,10 +87,9 @@ public class ServerSpaceReclaiming {
 
                     int desiredRepDeg = dbFileData.getDesiredReplicationDegree();
                     if (newRepDeg < desiredRepDeg) {
-                        byte[] data = new byte[64000];
-                        StringBuilder path = new StringBuilder(serverId);
-                        path.append("/").append(fileId).append("/").append(chunkNo);
-                        FileInputStream file = new FileInputStream(path.toString());
+                        byte[] data = new byte[Constants.maxChunkSize];
+                        String path = Paths.getChunkPath(serverId, fileId, chunkNo);
+                        FileInputStream file = new FileInputStream(path);
                         file.read(data);
                         file.close();
 

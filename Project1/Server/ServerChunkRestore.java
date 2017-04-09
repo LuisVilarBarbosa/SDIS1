@@ -1,6 +1,7 @@
 package Project1.Server;
 
 import Project1.Database.ServerDatabase;
+import Project1.General.Paths;
 import Project1.General.Constants;
 
 import java.io.ByteArrayOutputStream;
@@ -61,9 +62,8 @@ public class ServerChunkRestore {
                     int chunkNo = Integer.parseInt(m.getChunkNo());
 
                     if(db.getStoredFileData(fileId).getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
-                        StringBuilder path = new StringBuilder(serverId);
-                        path.append("/").append(fileId).append("/").append(chunkNo);
-                        FileInputStream file = new FileInputStream(path.toString());
+                        String path = Paths.getChunkPath(serverId, fileId, chunkNo);
+                        FileInputStream file = new FileInputStream(path);
                         file.read(data);
                         file.close();
 
