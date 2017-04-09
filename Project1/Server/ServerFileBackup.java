@@ -11,16 +11,6 @@ import java.util.Arrays;
 public class ServerFileBackup {
 	
 	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) {
-		//Responsavel por 
-		// - Abrir o ficheiro
-		// - Dividir em chunks
-		// - Criar chunk no e Message
-		// - Chamar o ChunkBackup
-		
-		//1 thread por ficheiro
-		
-		//Abrir o ficheiro
-
 		serverObject.getDb().addOrUpdateBackedUpFileData(filePath, fileId, replicationDegree);
 
 		try {

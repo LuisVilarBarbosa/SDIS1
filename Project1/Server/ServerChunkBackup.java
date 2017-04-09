@@ -16,9 +16,6 @@ import Project1.General.Constants;
 
 public class ServerChunkBackup {
 	
-	//TODO Create a different Multicast object for each thread
-	//Is this on this level, or higher?
-	
 	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) {
 		if(data == null) {
 			System.err.println("PutChunk : data = null not accepted.");

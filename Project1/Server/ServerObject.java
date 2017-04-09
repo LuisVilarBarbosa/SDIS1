@@ -29,15 +29,11 @@ public class ServerObject implements ServerRMI {
     }
 
     public void backup(String filePath, int replicationDegree) throws RemoteException {
-    	//Responsavel por
-    	// - Chamar o objeto que vai tratar da divis�o do ficheiro/envio
-    	// - Guardar a info do objeto na base de dados
-
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     	Date date = new Date(); //Actual time
     	dateFormat.format(date);
 
-    	//If file exists but is outdated
+    	//If file exists, we assume that is outdated
     	if(this.db.getBackedUpFileId(filePath) != null) {
     		delete(filePath);
     	}
