@@ -19,16 +19,8 @@ public class ServerChunkRestore {
     public static byte[] requestChunk(ServerObject serverObject, String fileId, int chunkNo) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh;
-        Multicast mDataRecoveryCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-			mDataRecoveryCh = serverObject.getDataRecoveryChannel();
-		} catch (CloneNotSupportedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return null;
-		}
+        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
 
         StringBuilder st = new StringBuilder("GETCHUNK ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
@@ -46,16 +38,8 @@ public class ServerChunkRestore {
     public static void chunkProvider(ServerObject serverObject) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh;
-        Multicast mDataRecoveryCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-			mDataRecoveryCh = serverObject.getDataRecoveryChannel();
-		} catch (CloneNotSupportedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
+        Multicast mControlCh = serverObject.getControlChannel();
+        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
         ServerDatabase db = serverObject.getDb();
 
         byte[] data = new byte[Constants.maxChunkSize];

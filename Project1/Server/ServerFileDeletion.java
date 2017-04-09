@@ -4,7 +4,6 @@ import Project1.Database.ServerDatabase;
 import Project1.General.Paths;
 
 import java.io.*;
-import java.util.regex.Pattern;
 
 /* Generic received message: DELETE <Version> <SenderId> <FileId> <CRLF><CRLF> */
 
@@ -13,14 +12,7 @@ public class ServerFileDeletion {
     public static void requestDeletion(ServerObject serverObject, String fileId) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+        Multicast mControlCh = serverObject.getControlChannel();
 
         StringBuilder st = new StringBuilder("DELETE ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
@@ -30,14 +22,7 @@ public class ServerFileDeletion {
     public static void fileChunksDeleter(ServerObject serverObject) {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
-        Multicast mControlCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+        Multicast mControlCh = serverObject.getControlChannel();
         ServerDatabase db = serverObject.getDb();
 
         while (true) {

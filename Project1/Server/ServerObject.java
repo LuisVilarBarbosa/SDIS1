@@ -28,7 +28,7 @@ public class ServerObject implements ServerRMI {
         this.db = db;
     }
 
-    public void backup(String filePath, int replicationDegree) throws RemoteException, FileNotFoundException, IOException {
+    public void backup(String filePath, int replicationDegree) throws RemoteException {
     	//Responsavel por
     	// - Chamar o objeto que vai tratar da divis�o do ficheiro/envio
     	// - Guardar a info do objeto na base de dados
@@ -36,16 +36,13 @@ public class ServerObject implements ServerRMI {
     	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     	Date date = new Date(); //Actual time
     	dateFormat.format(date);
-    	
+
     	//If file exists but is outdated
     	if(this.db.getBackedUpFileId(filePath) != null) {
     		delete(filePath);
     	}
     	
     	String fileId = calculateFileId(filePath, date.toString());
-    	this.db.addBackupFile(filePath, fileId, replicationDegree);
-    	
-    	//TODO IF fails, then delete file from DB
     	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
     }
 
@@ -83,8 +80,8 @@ public class ServerObject implements ServerRMI {
 
     public String getProtocolVersion(){ return protocolVersion; }
     public int getServerId() { return serverId; }
-    public Multicast getControlChannel() throws CloneNotSupportedException { return (Multicast) mControlCh.clone(); }
-    public Multicast getDataBackupChannel() throws CloneNotSupportedException { return (Multicast) mDataBackupCh.clone(); }
-    public Multicast getDataRecoveryChannel() throws CloneNotSupportedException { return (Multicast) mDataRecoveryCh.clone(); }
+    public Multicast getControlChannel() { return mControlCh.clone(); }
+    public Multicast getDataBackupChannel() { return mDataBackupCh.clone(); }
+    public Multicast getDataRecoveryChannel() { return mDataRecoveryCh.clone(); }
     public ServerDatabase getDb() { return db; }
 }

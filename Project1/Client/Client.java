@@ -2,10 +2,6 @@ package Project1.Client;
 
 import Project1.Server.ServerRMI;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -68,38 +64,21 @@ public class Client {
                 fileDeletion(serverRMI, opnd1);
             else if (subProtocol.equalsIgnoreCase("RECLAIM"))
                 manageServerStorage(serverRMI, opnd1);
-            else if (subProtocol.equalsIgnoreCase("STATE")) {
+            else if (subProtocol.equalsIgnoreCase("STATE"))
                 retrieveState(serverRMI);
-            }
 
         } catch (RemoteException e) {
             e.printStackTrace();
         } catch (NotBoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    private static void fileBackup(ServerRMI serverRMI, String filePath, String replicationDegree) throws IOException {
-    	FileInputStream fileInputStream = new FileInputStream(filePath);
-    	File file = new File(filePath);
-    	
-    	if(file.exists() && !file.isDirectory()) {
-    		try {
-        		serverRMI.backup(filePath, Integer.parseInt(replicationDegree));
-    		} catch(FileNotFoundException e) {
-    			System.out.println("Could not find " + filePath);
-    		} catch(RemoteException e) {
-    			e.printStackTrace();
-    		}
-    	} else {
-    		System.out.println("Invalid path");
-    	}
-    	fileInputStream.close();
+    private static void fileBackup(ServerRMI serverRMI, String filePath, String replicationDegree) throws RemoteException {
+        serverRMI.backup(filePath, Integer.parseInt(replicationDegree));
     }
 
-    private static void fileRestore(ServerRMI serverRMI, String filePath) throws IOException {
+    private static void fileRestore(ServerRMI serverRMI, String filePath) throws RemoteException {
         serverRMI.restore(filePath);
     }
 
@@ -116,32 +95,17 @@ public class Client {
     }
     
     private static boolean checkArguments(String subprotocol, String args[]) {
-    	if(subprotocol.equalsIgnoreCase("backup")){
-    		if(args.length != 4)
-    			return false;
-    		else
-    			return true;
-    	} else if(subprotocol.equalsIgnoreCase("restore")) {
-    		if(args.length != 3)
-    			return false;
-    		else
-    			return true;
-    	} else if(subprotocol.equalsIgnoreCase("delete")){
-    		if(args.length != 3)
-    			return false;
-    		else
-    			return true;
-    	} else if(subprotocol.equalsIgnoreCase("reclaim")){
-    		if(args.length != 3)
-    			return false;
-    		else
-    			return true;
-    	} else if(subprotocol.equalsIgnoreCase("state")) {
-    		if(args.length != 2)
-    			return false;
-    		else
-    			return true;
-    	} else
+    	if(subprotocol.equalsIgnoreCase("backup"))
+    			return args.length == 4;
+    	else if(subprotocol.equalsIgnoreCase("restore"))
+    			return args.length == 3;
+    	else if(subprotocol.equalsIgnoreCase("delete"))
+    			return args.length == 3;
+    	else if(subprotocol.equalsIgnoreCase("reclaim"))
+    			return args.length == 3;
+    	else if(subprotocol.equalsIgnoreCase("state"))
+    			return args.length == 2;
+    	else
     		return false;
     }
 }

@@ -185,16 +185,12 @@ public class ServerDatabase {
         return null;
     }
     
-    public void addBackupFile(String filePath, String fileId, int desiredReplicationDegree) {
-    	if(this.backedUpFiles.containsKey(fileId))
-    		return;
+    public void addOrUpdateBackedUpFileData(String filePath, String fileId, int desiredReplicationDegree) {
     	DBFileData fileData = new DBFileData(filePath, fileId, desiredReplicationDegree);
     	this.backedUpFiles.put(fileId, fileData);
     }
     
-    public void addStoredFile(String fileId, int desiredReplicationDegree) {
-    	if(this.storedFiles.containsKey(fileId))
-    		return;
+    public void addOrUpdateStoredFileData(String fileId, int desiredReplicationDegree) {
     	DBFileData fileData = new DBFileData("", fileId, desiredReplicationDegree);
     	this.storedFiles.put(fileId, fileData);
     }

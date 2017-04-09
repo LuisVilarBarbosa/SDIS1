@@ -19,21 +19,13 @@ public class ServerChunkBackup {
 	//TODO Create a different Multicast object for each thread
 	//Is this on this level, or higher?
 	
-	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) throws RemoteException {
+	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) {
 		if(data == null) {
 			System.err.println("PutChunk : data = null not accepted.");
 			return;
 		}
-		Multicast mControlCh;
-		Multicast mDataBackupCh;
-		try {
-			mControlCh = serverObject.getControlChannel();
-			mDataBackupCh = serverObject.getDataBackupChannel();
-		} catch (CloneNotSupportedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return;
-		}
+		Multicast mControlCh = serverObject.getControlChannel();
+		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
 		
 		StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
 		headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
@@ -78,9 +70,8 @@ public class ServerChunkBackup {
 		}
 		
 		if(retries >= 5)
-			throw new RemoteException("Cannot backup: Number of retries exceeded");
-		
-		
+			System.out.println("Cannot backup '" + fileId + "' - chunk no. " + chunkNumber + ": Number of retries exceeded");
+
 		FileChunkData chunkData = new FileChunkData(chunkNumber, data.length, storedConfirmations.size());
 		serverObject.getDb().getBackedUpFileData(fileId).addOrUpdateFileChunkData(chunkData);
 	}
@@ -97,16 +88,8 @@ public class ServerChunkBackup {
 		while (true) {
 			String protocolVersion = serverObject.getProtocolVersion();
 			int serverId = serverObject.getServerId();    // not used, but should be used to send STORED message
-			Multicast mControlCh;
-			Multicast mDataBackupCh;
-			try {
-				mControlCh = serverObject.getControlChannel();
-				mDataBackupCh = serverObject.getDataBackupChannel();
-			} catch (CloneNotSupportedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				return;
-			}
+			Multicast mControlCh = serverObject.getControlChannel();
+			Multicast mDataBackupCh = serverObject.getDataBackupChannel();
 
 			Message m = new Message(mDataBackupCh.receive());
 
@@ -152,7 +135,7 @@ public class ServerChunkBackup {
 				mControlCh.send(headerBuilder.toString().getBytes());
 
 				//Put fileInfo in the database
-				serverObject.getDb().addStoredFile(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
+				serverObject.getDb().addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
 				FileChunkData chunkData = new FileChunkData(
 						Integer.parseInt(m.getChunkNo()),
 						m.getBody().length,

@@ -51,15 +51,12 @@ public class Server {
         try {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
-
             Registry r = LocateRegistry.createRegistry(Integer.parseInt(remoteObjName));    // port defined by 'remoteObjName'
-
         	
 	        Timer timer1 = new Timer();
 	        TimerTask timerTask1 = new TimerTask() {
 	            @Override
 	            public void run() {
-	            	//Must receive a server Object
 	                ServerChunkBackup.storeChunk(serverObj);
 	            }
 	        };
@@ -92,7 +89,7 @@ public class Server {
 	        };
 	        timer4.schedule(timerTask4, 0);
 
-            r.rebind(remoteObjName, (Remote) serverRMI);
+            r.rebind(remoteObjName, serverRMI);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

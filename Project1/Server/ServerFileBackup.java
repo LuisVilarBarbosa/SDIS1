@@ -2,17 +2,15 @@ package Project1.Server;
 
 import Project1.General.Constants;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.rmi.RemoteException;
 import java.util.Arrays;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 
 public class ServerFileBackup {
 	
-	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) throws IOException {
+	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) {
 		//Responsavel por 
 		// - Abrir o ficheiro
 		// - Dividir em chunks
@@ -22,21 +20,31 @@ public class ServerFileBackup {
 		//1 thread por ficheiro
 		
 		//Abrir o ficheiro
-		FileInputStream fis = new FileInputStream(filePath);
 
-		int bytesRead = Constants.maxChunkSize;
+		serverObject.getDb().addOrUpdateBackedUpFileData(filePath, fileId, replicationDegree);
 
-		for(int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++){
-			byte[] chunkData = new byte[Constants.maxChunkSize];
-			bytesRead = fis.read(chunkData);
-			System.out.println("Chunk number:" + chunkNumber);
+		try {
+			FileInputStream fis = new FileInputStream(filePath);
 
-			//Send data to Chunk Backup
-			if(bytesRead != Constants.maxChunkSize)
-				chunkData = Arrays.copyOf(chunkData, bytesRead);
-			ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
+			int bytesRead = Constants.maxChunkSize;
+
+			for (int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++) {
+				byte[] chunkData = new byte[Constants.maxChunkSize];
+				bytesRead = fis.read(chunkData);
+				System.out.println("Chunk number:" + chunkNumber);
+
+				//Send data to Chunk Backup
+				if (bytesRead != Constants.maxChunkSize)
+					chunkData = Arrays.copyOf(chunkData, bytesRead);
+				ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
+			}
+
+			fis.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		fis.close();
+
 	}
 }

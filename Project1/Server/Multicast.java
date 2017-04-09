@@ -14,15 +14,6 @@ public class Multicast {
     private String multicastAddress;
     private int multicastPort;
 
-    public Multicast() {
-        try {
-            socket = new MulticastSocket();
-            socket.setTimeToLive(timeToLive); //To avoid network congestion
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public Multicast(String groupAddress, int groupPort) {
         try {
             socket = new MulticastSocket(groupPort);
@@ -70,8 +61,7 @@ public class Multicast {
         socket.close();
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public Multicast clone() {
         return new Multicast(multicastAddress, multicastPort);
     }
 }
