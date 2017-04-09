@@ -15,20 +15,35 @@ import java.util.StringTokenizer;
 public class Client {
 
     public static void main(String args[]) {
-        if (args.length < 3 || args.length > 4) {
+        if (args.length < 2 || args.length > 4) {
             System.out.println("Client <peer_ap> <sub_protocol> <opnd_1> [<opnd_2>]");
             return;
         }
 
         String peerAccessPoint = args[0];
         String subProtocol = args[1];
+        if(!checkArguments(subProtocol, args)) {
+        	if(subProtocol.equalsIgnoreCase("backup")){
+        		System.out.println("Client <peer_ap> BACKUP <file_path> <replication_degree>");
+        	} else if(subProtocol.equalsIgnoreCase("restore")) {
+        		System.out.println("Client <peer_ap> RESTORE <file_path>");
+        	} else if(subProtocol.equalsIgnoreCase("delete")) {
+        		System.out.println("Client <peer_ap> DELETE <file_path>");
+        	} else if(subProtocol.equalsIgnoreCase("reclaim")) {
+        		System.out.println("Client <peer_ap> RECLAIM <mem_space>");
+        	} else if(subProtocol.equalsIgnoreCase("state")) {
+        		System.out.println("Client <peer_ap> STATE");
+        	} else {
+        		System.out.println("INVALID ARGUMENTS");
+        		return;
+        	}
+        }
         String opnd1 = null;
         if (args.length >= 3)
             opnd1 = args[2];
         String opnd2 = null;
         if (args.length >= 4)
             opnd2 = args[3];
-
         StringTokenizer st = new StringTokenizer(peerAccessPoint, ":");
         String peerHostName = null;
         String peerRemoteObjName;
@@ -39,6 +54,7 @@ public class Client {
             peerRemoteObjName = st.nextToken();
         } else
             throw new IllegalArgumentException("Invalid peer access point.");
+        
 
         try {
             Registry r = LocateRegistry.getRegistry(peerHostName);
@@ -52,8 +68,9 @@ public class Client {
                 fileDeletion(serverRMI, opnd1);
             else if (subProtocol.equalsIgnoreCase("RECLAIM"))
                 manageServerStorage(serverRMI, opnd1);
-            else if (subProtocol.equalsIgnoreCase("STATE"))
+            else if (subProtocol.equalsIgnoreCase("STATE")) {
                 retrieveState(serverRMI);
+            }
 
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -95,6 +112,36 @@ public class Client {
     }
 
     private static void retrieveState(ServerRMI serverRMI) throws RemoteException {
-        serverRMI.state();
+        System.out.println(serverRMI.state());
+    }
+    
+    private static boolean checkArguments(String subprotocol, String args[]) {
+    	if(subprotocol.equalsIgnoreCase("backup")){
+    		if(args.length != 4)
+    			return false;
+    		else
+    			return true;
+    	} else if(subprotocol.equalsIgnoreCase("restore")) {
+    		if(args.length != 3)
+    			return false;
+    		else
+    			return true;
+    	} else if(subprotocol.equalsIgnoreCase("delete")){
+    		if(args.length != 3)
+    			return false;
+    		else
+    			return true;
+    	} else if(subprotocol.equalsIgnoreCase("reclaim")){
+    		if(args.length != 3)
+    			return false;
+    		else
+    			return true;
+    	} else if(subprotocol.equalsIgnoreCase("state")) {
+    		if(args.length != 2)
+    			return false;
+    		else
+    			return true;
+    	} else
+    		return false;
     }
 }
