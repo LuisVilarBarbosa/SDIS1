@@ -36,12 +36,12 @@ public class ServerChunkBackup {
 		append("\r\n\r\n");
 
 		byte[] header = headerBuilder.toString().getBytes();
-		byte[] chunk = new byte[Constants.maxMessageSize];
+		byte[] chunk = new byte[header.length + data.length];
 		System.arraycopy(header, 0, chunk, 0, header.length);
 		System.arraycopy(data, 0, chunk, header.length, data.length);
 
 		//Send the chunk
-		mDataBackupCh.send(header);
+		mDataBackupCh.send(chunk);
 		
 		//Wait in the control channel for STORED messages
 		// - Count number of STORED's received in 1 sec
@@ -55,13 +55,16 @@ public class ServerChunkBackup {
 		{
 			while(elapsedTime < waitTime) {
 				try {
-					Message m = new Message(mControlCh.receive(waitTime));
-					if(m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
-						storedConfirmations.add(m);
+					byte[] msg = mControlCh.receive(waitTime);
+					if(msg != null) {
+						Message m = new Message(msg);
+						if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
+							storedConfirmations.add(m);
+					}
 				} catch (SocketException e) {
 					break;
 				}
-				
+
 				elapsedTime += System.currentTimeMillis() - lastTime;
 				lastTime = System.currentTimeMillis();
 			}
