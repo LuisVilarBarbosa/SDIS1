@@ -35,7 +35,7 @@ public class ServerChunkRestore {
         int serverId = serverObject.getServerId();
         Multicast mControlCh = serverObject.getControlChannel();
         Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
-        ServerDatabase db;  // should be used
+        ServerDatabase db = serverObject.getDb();
 
         byte[] data = new byte[chunkSize];
         while (true) {
@@ -44,9 +44,7 @@ public class ServerChunkRestore {
                 Message m = new Message(request1);
 
                 //Notification that other server has attended the request first
-                byte[] request2 = null;
-                for (long waitTime = new Random().nextInt() % maxWaitTime, ini = System.currentTimeMillis(); request2 == null && System.currentTimeMillis() - ini < waitTime; )
-                    request2 = mDataRecoveryCh.receive();
+                byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt() % maxWaitTime);
 
                 if(request2 != null) {
                     Message m2 = new Message(request2);
@@ -54,24 +52,26 @@ public class ServerChunkRestore {
                         continue;
                 }
 
-                if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) { //Else, this server attends the request
+                if (m.getMessageType().equalsIgnoreCase("GETCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) { //This server attends the request
                     String fileId = m.getFileId();
-                    String chunkNo = m.getChunkNo();
+                    int chunkNo = Integer.parseInt(m.getChunkNo());
 
-                    StringBuilder path = new StringBuilder(serverId);
-                    path.append("/").append(fileId).append("/").append(chunkNo);
-                    FileInputStream file = new FileInputStream(path.toString());
-                    file.read(data);
-                    file.close();
+                    if(db.getStoredFileData(fileId).getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
+                        StringBuilder path = new StringBuilder(serverId);
+                        path.append("/").append(fileId).append("/").append(chunkNo);
+                        FileInputStream file = new FileInputStream(path.toString());
+                        file.read(data);
+                        file.close();
 
-                    StringBuilder headerToSend = new StringBuilder("CHUNK ");
-                    headerToSend.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
+                        StringBuilder headerToSend = new StringBuilder("CHUNK ");
+                        headerToSend.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
 
-                    ByteArrayOutputStream msg = new ByteArrayOutputStream();
-                    msg.write(headerToSend.toString().getBytes());
-                    msg.write(data);
-                    mDataRecoveryCh.send(msg.toByteArray());
-                    msg.close();
+                        ByteArrayOutputStream msg = new ByteArrayOutputStream();
+                        msg.write(headerToSend.toString().getBytes());
+                        msg.write(data);
+                        mDataRecoveryCh.send(msg.toByteArray());
+                        msg.close();
+                    }
                 }
             } catch (FileNotFoundException e) {
             } catch (IOException e) {

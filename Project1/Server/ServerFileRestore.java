@@ -13,11 +13,6 @@ public class ServerFileRestore {
         else
             System.out.println("Restore: error creating the directory '" + filePath + "'");
 
-        String protocolVersion = serverObject.getProtocolVersion();
-        int serverId = serverObject.getServerId();
-        Multicast mControlCh = serverObject.getControlChannel();
-        Multicast mDataRecoveryCh = serverObject.getDataRecoveryChannel();
-
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             byte[] data;
