@@ -5,7 +5,7 @@ public class Paths {
 
     private static StringBuilder calculateFolderPath(int serverId, String fileId) {
         StringBuilder sb = new StringBuilder();
-        sb.append(serverId).append(pathDelim).append(fileId);
+        sb.append("servers_data").append(pathDelim).append(serverId).append(pathDelim).append(fileId);
         return sb;
     }
 
