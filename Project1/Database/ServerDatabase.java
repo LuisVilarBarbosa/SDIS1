@@ -103,7 +103,8 @@ public class ServerDatabase {
             FileOutputStream fos = new FileOutputStream(dbPath);
             OutputStreamWriter file = new OutputStreamWriter(fos);
 
-            file.write(storageCapacity + "\r\n\r\nBacked up files:\r\n");
+            file.write(String.valueOf(storageCapacity));
+            file.write("\r\n\r\nBacked up files:\r\n");
             storeDatabase(file, backedUpFiles);
             file.write("\r\nStored files:\r\n");
             storeDatabase(file, storedFiles);
@@ -123,10 +124,11 @@ public class ServerDatabase {
             String filePath = dbFileData.getFilePath();
             String fileId = dbFileData.getFileId();
             int desiredReplicationDegree = dbFileData.getDesiredReplicationDegree();
-            int numFileChunks = dbFileData.getNumFileChunks();
-            for (int i = 0; i < numFileChunks; i++) {
-                FileChunkData fileChunkData = dbFileData.getFileChunkData(i);
-                StringBuilder st = new StringBuilder(entry.getKey());
+
+            ArrayList<Integer> chunksNos = dbFileData.listChunksNos();
+            for (int chunkNo : chunksNos) {
+                FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
+                StringBuilder st = new StringBuilder();
                 st.append(delim).append(filePath);
                 st.append(delim).append(fileId);
                 st.append(delim).append(desiredReplicationDegree);

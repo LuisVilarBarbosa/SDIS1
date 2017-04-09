@@ -1,5 +1,6 @@
 package Project1.Database;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DBFileData {
@@ -41,6 +42,13 @@ public class DBFileData {
 
     public void removeFileChunkData(int chunkNo) {
         fileChunksData.remove(chunkNo);
+    }
+
+    public ArrayList<Integer> listChunksNos() {
+        ArrayList<Integer> chunksNos = new ArrayList<>();
+        for (Integer key : fileChunksData.keySet())
+            chunksNos.add(key);
+        return chunksNos;
     }
 
 }
