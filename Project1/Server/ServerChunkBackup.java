@@ -1,11 +1,13 @@
 package Project1.Server;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import Project1.Database.DBFileData;
 import Project1.Database.FileChunkData;
 import Project1.Database.ServerDatabase;
 import Project1.General.Paths;
@@ -118,6 +120,7 @@ public class ServerChunkBackup {
 				//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
 				if (serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())) {
 					try {
+						new File(Paths.getFolderPath(serverId, m.getFileId())).mkdirs();
 						String filePath = Paths.getChunkPath(serverId, m.getFileId(), Integer.parseInt(m.getChunkNo()));
 						FileOutputStream fileStream = new FileOutputStream(filePath);
 						fileStream.write(m.getBody());
@@ -125,7 +128,7 @@ public class ServerChunkBackup {
 					} catch (IOException e) {
 						//TODO Could not write/create file message?
 						e.printStackTrace();
-						return;
+						continue;
 					}
 				}
 
@@ -139,12 +142,16 @@ public class ServerChunkBackup {
 				mControlCh.send(headerBuilder.toString().getBytes());
 
 				//Put fileInfo in the database
-				db.addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
 				FileChunkData chunkData = new FileChunkData(
 						Integer.parseInt(m.getChunkNo()),
 						m.getBody().length,
 						actualReplicationDegree);
-				db.getStoredFileData(m.getFileId()).addOrUpdateFileChunkData(chunkData);
+				DBFileData dbFileData = db.getStoredFileData(m.getFileId());
+				if(dbFileData == null) {
+					db.addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
+					dbFileData = db.getStoredFileData(m.getFileId());
+				}
+				dbFileData.addOrUpdateFileChunkData(chunkData);
 			}
 		}
 	}

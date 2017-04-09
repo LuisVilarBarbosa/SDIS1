@@ -4,8 +4,8 @@ public class Paths {
     private static final char pathDelim = '/';
 
     private static StringBuilder calculateFolderPath(int serverId, String fileId) {
-        StringBuilder sb = new StringBuilder(serverId);
-        sb.append(pathDelim).append(fileId);
+        StringBuilder sb = new StringBuilder();
+        sb.append(serverId).append(pathDelim).append(fileId);
         return sb;
     }
 

@@ -44,11 +44,11 @@ public class Multicast {
             DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
             socket.receive(mcastReceive);
             data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
+            return data;
         } catch (IOException e) {
         	System.out.println("Timeout expired, did not receive anything");
         	return null;
         }
-        return data;
     }
     
     public byte[] receive(int blockingTime) throws SocketException{
