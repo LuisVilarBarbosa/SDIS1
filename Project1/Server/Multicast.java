@@ -45,7 +45,8 @@ public class Multicast {
             socket.receive(mcastReceive);
             data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
         } catch (IOException e) {
-            e.printStackTrace();
+        	System.out.println("Timeout expired, did not receive anything");
+        	return null;
         }
         return data;
     }
