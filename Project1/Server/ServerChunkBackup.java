@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import Project1.Database.FileChunkData;
+import Project1.Database.ServerDatabase;
 import Project1.General.Paths;
 import Project1.General.Constants;
 
@@ -92,12 +93,13 @@ public class ServerChunkBackup {
 		// - Send STORED confirmation
 		// - Update peer's database
 
-		while (true) {
-			String protocolVersion = serverObject.getProtocolVersion();
-			int serverId = serverObject.getServerId();    // not used, but should be used to send STORED message
-			Multicast mControlCh = serverObject.getControlChannel();
-			Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+		String protocolVersion = serverObject.getProtocolVersion();
+		int serverId = serverObject.getServerId();    // not used, but should be used to send STORED message
+		Multicast mControlCh = serverObject.getControlChannel();
+		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
+		ServerDatabase db = serverObject.getDb();
 
+		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
 
 			if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
@@ -142,12 +144,12 @@ public class ServerChunkBackup {
 				mControlCh.send(headerBuilder.toString().getBytes());
 
 				//Put fileInfo in the database
-				serverObject.getDb().addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
+				db.addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
 				FileChunkData chunkData = new FileChunkData(
 						Integer.parseInt(m.getChunkNo()),
 						m.getBody().length,
 						actualReplicationDegree);
-				serverObject.getDb().getStoredFileData(m.getFileId()).addOrUpdateFileChunkData(chunkData);
+				db.getStoredFileData(m.getFileId()).addOrUpdateFileChunkData(chunkData);
 			}
 		}
 	}
