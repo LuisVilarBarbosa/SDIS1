@@ -37,13 +37,13 @@ public class ServerObject implements ServerRMI {
     	Date date = new Date(); //Actual time
     	dateFormat.format(date);
     	
-    	String fileId = calculateFileId(filePath, date.toString());
-    	this.db.addBackupFile(filePath, fileId, replicationDegree);
-    	
     	//If file exists but is outdated
     	if(this.db.getBackedUpFileId(filePath) != null) {
     		delete(filePath);
     	}
+    	
+    	String fileId = calculateFileId(filePath, date.toString());
+    	this.db.addBackupFile(filePath, fileId, replicationDegree);
     	
     	//TODO IF fails, then delete file from DB
     	ServerFileBackup.backup(this, filePath, fileId, replicationDegree);
