@@ -123,7 +123,7 @@ public class ServerDatabase {
             String fileId = dbFileData.getFileId();
             int desiredReplicationDegree = dbFileData.getDesiredReplicationDegree();
             int numFileChunks = dbFileData.getNumFileChunks();
-            for (int i = 1; i <= numFileChunks; i++) {
+            for (int i = 0; i < numFileChunks; i++) {
                 FileChunkData fileChunkData = dbFileData.getFileChunkData(i);
                 StringBuilder st = new StringBuilder(entry.getKey());
                 st.append(delim).append(filePath);
