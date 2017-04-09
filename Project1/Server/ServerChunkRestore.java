@@ -6,6 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Random;
 
 /* Generic received message: GETCHUNK <Version> <SenderId> <FileId> <ChunkNo> <CRLF><CRLF> */
@@ -25,9 +26,13 @@ public class ServerChunkRestore {
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
         mControlCh.send(st.toString().getBytes());
 
-        byte[] data = mDataRecoveryCh.receive();
-        Message m = new Message(data);
-        return m.getBody();
+        try {
+            byte[] data = mDataRecoveryCh.receive(1000);
+            Message m = new Message(data);
+            return m.getBody();
+        } catch (SocketException e) {
+            return null;
+        }
     }
 
     public static void chunkProvider(ServerObject serverObject) {

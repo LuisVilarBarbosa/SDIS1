@@ -8,7 +8,6 @@ import java.net.SocketException;
 import java.util.Arrays;
 
 public class Multicast {
-    public static final int timeout = 1;    /* milliseconds */
     public static final int timeToLive = 1;
     public static final int UDP_DATAGRAM_MAX_LENGTH = 65536; //2^16
     private MulticastSocket socket;
@@ -24,12 +23,10 @@ public class Multicast {
         }
     }
 
-    public Multicast(String groupAddress, int groupPort, boolean timeout) {
+    public Multicast(String groupAddress, int groupPort) {
         try {
             socket = new MulticastSocket(groupPort);
             socket.joinGroup(InetAddress.getByName(groupAddress));
-            if (timeout)
-                socket.setSoTimeout(this.timeout);
             socket.setTimeToLive(timeToLive);    //To avoid network congestion
             multicastAddress = groupAddress;
             multicastPort = groupPort;
@@ -63,16 +60,9 @@ public class Multicast {
     }
     
     public byte[] receive(int blockingTime) throws SocketException{
-    	byte[] data = new byte[UDP_DATAGRAM_MAX_LENGTH];
-        DatagramPacket mcastReceive = new DatagramPacket(data, data.length);
         socket.setSoTimeout(blockingTime);
-        try {
-			socket.receive(mcastReceive);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        byte[] data = receive();
         socket.setSoTimeout(0);
-        data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
         return data;
     }
 
@@ -82,6 +72,6 @@ public class Multicast {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        return new Multicast(multicastAddress, multicastPort, false);
+        return new Multicast(multicastAddress, multicastPort);
     }
 }

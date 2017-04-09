@@ -31,9 +31,9 @@ public class Server {
         String mDataRecoveryIp = args[7];
         int mDataRecoveryPort = Integer.parseInt(args[8]);
 
-        Multicast mControlCh = new Multicast(mControlIp, mControlPort, false);
-        Multicast mDataBackupCh = new Multicast(mDataBackupIp, mDataBackupPort, false);
-        Multicast mDataRecoveryCh = new Multicast(mDataRecoveryIp, mDataRecoveryPort, true);
+        Multicast mControlCh = new Multicast(mControlIp, mControlPort);
+        Multicast mDataBackupCh = new Multicast(mDataBackupIp, mDataBackupPort);
+        Multicast mDataRecoveryCh = new Multicast(mDataRecoveryIp, mDataRecoveryPort);
 
         StringTokenizer st = new StringTokenizer(accessPoint, ":");
         String hostName = null;
