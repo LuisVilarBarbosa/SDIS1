@@ -1,17 +1,16 @@
 package Project1.Database;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class ServerDatabase {
+    private static final int updateFilePeriod = 10000;  // milliseconds
     private static final String dbFilename = "database.txt";
     private static final String delim = "|";
     private final String dbPath;
     private long storageCapacity = 1000000;    // KBytes (default defined for the first use)
     private HashMap<String, DBFileData> backedUpFiles = new HashMap<>();    // backed up to other peers
-    private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData> 
+    private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData>
 
     public ServerDatabase(int serverId) {
         dbPath = serverId + "/" + dbFilename;
@@ -45,6 +44,9 @@ public class ServerDatabase {
             e.printStackTrace();
         }
 
+        // update the database file to prevent failures
+        createUpdateThread();
+
         // on program shutdown save database to file
         Runtime.getRuntime().addShutdownHook(shutdownThread());
     }
@@ -67,28 +69,43 @@ public class ServerDatabase {
         }
     }
 
+    private void createUpdateThread() {
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                saveDatabase();
+            }
+        };
+        timer.schedule(timerTask, 0, updateFilePeriod);
+    }
+
     private Thread shutdownThread() {
         return new Thread() {
             @Override
             public void run() {
-                try {
-                    FileOutputStream fos = new FileOutputStream(dbPath);
-                    OutputStreamWriter file = new OutputStreamWriter(fos);
-
-                    file.write(storageCapacity + "\r\n\r\nBacked up files:\r\n");
-                    storeDatabase(file, backedUpFiles);
-                    file.write("\r\nStored files:\r\n");
-                    storeDatabase(file, storedFiles);
-
-                    file.close();
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                saveDatabase();
             }
         };
+    }
+
+    private void saveDatabase() {
+        try {
+            FileOutputStream fos = new FileOutputStream(dbPath);
+            OutputStreamWriter file = new OutputStreamWriter(fos);
+
+            file.write(storageCapacity + "\r\n\r\nBacked up files:\r\n");
+            storeDatabase(file, backedUpFiles);
+            file.write("\r\nStored files:\r\n");
+            storeDatabase(file, storedFiles);
+
+            file.close();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void storeDatabase(OutputStreamWriter file, HashMap<String, DBFileData> filesData) throws IOException {
