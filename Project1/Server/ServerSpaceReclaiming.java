@@ -23,7 +23,7 @@ public class ServerSpaceReclaiming {
         db.setStorageCapacity(newStorageSpace);
 
         ArrayList<String> filesIds = db.getStoredFilesIds();
-        long usedStorage = db.getUsedStorage();   // just for efficiency, it could be db.getUsedStorage()
+        long usedStorage = db.getUsedStorage();   // just for efficiency
 
         for (int i = 0; i < filesIds.size() && usedStorage > newStorageSpace; i++) {
             String fileId = filesIds.get(i);
@@ -39,6 +39,8 @@ public class ServerSpaceReclaiming {
                 FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
                 dbFileData.removeFileChunkData(chunkNo);
                 usedStorage -= fileChunkData.getSize();
+                if(db.getStoredFileData(fileId).getNumFileChunks() == 0)
+                    db.removeStoredFile(fileId);
 
                 // send "removed" message to the other peers
                 StringBuilder sb = new StringBuilder("REMOVED ");
