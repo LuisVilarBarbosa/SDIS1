@@ -33,7 +33,10 @@ public class ServerChunkRestore {
             byte[] data = mDataRecoveryCh.receive(Constants.maxWaitTime);
             if(data == null)
                 return null;
-            Message m = new Message(data);
+            Message m;
+            do {
+                m = new Message(data);
+            } while(Integer.parseInt(m.getSenderId()) == serverId);
             System.out.println("Received: " + m.getHeader());
             return m.getBody();
         } catch (SocketException e) {
@@ -53,6 +56,8 @@ public class ServerChunkRestore {
             try {
                 byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
+                if(Integer.parseInt(m.getSenderId()) == serverId)
+                    continue;
                 System.out.println("Received: " + m.getHeader());
 
                 //Notification that other server has attended the request first
@@ -60,6 +65,8 @@ public class ServerChunkRestore {
 
                 if(request2 != null) {
                     Message m2 = new Message(request2);
+                    if(Integer.parseInt(m2.getSenderId()) == serverId)
+                        continue;
                     System.out.println("Received: " + m2.getHeader());
                     if (m2.getMessageType().equalsIgnoreCase("CHUNK") &&
                             m2.getFileId().equals(m.getFileId()) &&

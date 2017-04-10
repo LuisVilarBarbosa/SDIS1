@@ -24,12 +24,13 @@ public class ServerChunkBackup {
 			return;
 		}
 		String protocolVersion = serverObject.getProtocolVersion();
+		int serverId = serverObject.getServerId();
 		Multicast mControlCh = serverObject.getControlChannel();
 		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
 		
 		StringBuilder headerBuilder = new StringBuilder("PUTCHUNK ");
 		headerBuilder.append(serverObject.getProtocolVersion()).append(" ").
-		append(serverObject.getServerId()).append(" ").
+		append(serverId).append(" ").
 		append(fileId).append(" ").
 		append(chunkNumber).append(" ").
 		append(replicationDegree).append("\r\n\r\n");
@@ -59,6 +60,8 @@ public class ServerChunkBackup {
 					byte[] msg = mControlCh.receive(waitTime);
 					if(msg != null) {
 						Message m = new Message(msg);
+						if(Integer.parseInt(m.getSenderId()) == serverId)
+							continue;
 						System.out.println("Received: " + m.getHeader());
 						if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
 							storedConfirmations.add(m);
@@ -103,11 +106,9 @@ public class ServerChunkBackup {
 		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
 			System.out.println("Received: " + m.getHeader());
-			
-			if(m.getSenderId().equals(serverObject.getServerId())){
-				System.out.println("Message from myself. Ignoring...");
+
+			if(Integer.parseInt(m.getSenderId()) == serverId)
 				continue;
-			}
 
 			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
 				int delay = new Random().nextInt(Constants.maxDelayTime);
@@ -121,9 +122,14 @@ public class ServerChunkBackup {
 						Message feedbackMessage;
 						if(msg != null){
 							feedbackMessage = new Message(msg);
-							System.out.println("Received: " + feedbackMessage.getHeader());
-							if (feedbackMessage.getChunkNo().equals(m.getChunkNo()))
+							if (feedbackMessage.getMessageType().equalsIgnoreCase("STORED") &&
+									feedbackMessage.getVersion().equalsIgnoreCase(protocolVersion) &&
+									Integer.parseInt(m.getSenderId()) != serverId &&
+									feedbackMessage.getFileId().equals(m.getFileId()) &&
+									feedbackMessage.getChunkNo().equals(m.getChunkNo())) {
+								System.out.println("Received: " + feedbackMessage.getHeader());
 								actualReplicationDegree++;
+							}
 						}
 					} catch (SocketException e) {
 						break;

@@ -66,6 +66,8 @@ public class ServerSpaceReclaiming {
             try {
                 byte[] info1 = mControlCh.receive(); //Removed info
                 Message m1 = new Message(info1);
+                if(Integer.parseInt(m1.getSenderId()) == serverId)
+                    continue;
 
                 if (m1.getMessageType().equalsIgnoreCase("REMOVED") && m1.getVersion().equalsIgnoreCase(protocolVersion)) {
                     System.out.println("Received: " + m1.getHeader());

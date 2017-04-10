@@ -39,6 +39,8 @@ public class ServerFileDeletion {
         while (true) {
                 byte[] request = mControlCh.receive();
                 Message m = new Message(request);
+                if(Integer.parseInt(m.getSenderId()) == serverId)
+                    continue;
 
                 if (m.getMessageType().equalsIgnoreCase("DELETE") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
                     System.out.println("Received: " + m.getHeader());
