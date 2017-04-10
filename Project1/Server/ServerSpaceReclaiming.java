@@ -29,9 +29,10 @@ public class ServerSpaceReclaiming {
         for (int i = 0; i < filesIds.size() && usedStorage > newStorageSpace; i++) {
             String fileId = filesIds.get(i);
             DBFileData dbFileData = db.getStoredFileData(fileId);
-            int numFileChunks = dbFileData.getNumFileChunks();
+            ArrayList<Integer> fileChunksNos = dbFileData.listChunksNos();
 
-            for (int chunkNo = 0; chunkNo < numFileChunks && usedStorage > newStorageSpace; chunkNo++) {
+            for (int j = 0; j < fileChunksNos.size() && usedStorage > newStorageSpace; j++) {
+                int chunkNo = fileChunksNos.get(j);
                 // delete file from the file system
                 String path = Paths.getChunkPath(serverId, fileId, chunkNo);
                 new File(path.toString()).delete();

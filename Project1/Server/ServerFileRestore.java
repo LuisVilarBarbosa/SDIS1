@@ -46,7 +46,7 @@ public class ServerFileRestore {
                     fileOutputStream.write(data);
                     chunkNo++;
                 }
-            } while (data.length == Constants.maxChunkSize);
+            } while (!error && data.length == Constants.maxChunkSize);
 
             fileOutputStream.close();
 
