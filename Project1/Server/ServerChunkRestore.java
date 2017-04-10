@@ -2,8 +2,8 @@ package Project1.Server;
 
 import Project1.Database.DBFileData;
 import Project1.Database.ServerDatabase;
-import Project1.General.Paths;
 import Project1.General.Constants;
+import Project1.General.Paths;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -31,12 +31,12 @@ public class ServerChunkRestore {
 
         try {
             byte[] data = mDataRecoveryCh.receive(Constants.maxWaitTime);
-            if(data == null)
+            if (data == null)
                 return null;
             Message m;
             do {
                 m = new Message(data);
-            } while(Integer.parseInt(m.getSenderId()) == serverId);
+            } while (Integer.parseInt(m.getSenderId()) == serverId);
             System.out.println("Received: " + m.getHeader());
             return m.getBody();
         } catch (SocketException e) {
@@ -56,16 +56,16 @@ public class ServerChunkRestore {
             try {
                 byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
-                if(Integer.parseInt(m.getSenderId()) == serverId)
+                if (Integer.parseInt(m.getSenderId()) == serverId)
                     continue;
                 System.out.println("Received: " + m.getHeader());
 
                 //Notification that other server has attended the request first
                 byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt(Constants.maxDelayTime));
 
-                if(request2 != null) {
+                if (request2 != null) {
                     Message m2 = new Message(request2);
-                    if(Integer.parseInt(m2.getSenderId()) == serverId)
+                    if (Integer.parseInt(m2.getSenderId()) == serverId)
                         continue;
                     System.out.println("Received: " + m2.getHeader());
                     if (m2.getMessageType().equalsIgnoreCase("CHUNK") &&
@@ -79,7 +79,7 @@ public class ServerChunkRestore {
                     int chunkNo = Integer.parseInt(m.getChunkNo());
 
                     DBFileData dbFileData = db.getStoredFileData(fileId);
-                    if(dbFileData != null && dbFileData.getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
+                    if (dbFileData != null && dbFileData.getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
                         String path = Paths.getChunkPath(serverId, fileId, chunkNo);
                         FileInputStream file = new FileInputStream(path);
                         int bytesRead = file.read(data);

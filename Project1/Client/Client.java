@@ -18,21 +18,21 @@ public class Client {
 
         String peerAccessPoint = args[0];
         String subProtocol = args[1];
-        if(!checkArguments(subProtocol, args)) {
-        	if(subProtocol.equalsIgnoreCase("backup")){
-        		System.out.println("Client <peer_ap> BACKUP <file_path> <replication_degree>");
-        	} else if(subProtocol.equalsIgnoreCase("restore")) {
-        		System.out.println("Client <peer_ap> RESTORE <file_path>");
-        	} else if(subProtocol.equalsIgnoreCase("delete")) {
-        		System.out.println("Client <peer_ap> DELETE <file_path>");
-        	} else if(subProtocol.equalsIgnoreCase("reclaim")) {
-        		System.out.println("Client <peer_ap> RECLAIM <mem_space>");
-        	} else if(subProtocol.equalsIgnoreCase("state")) {
-        		System.out.println("Client <peer_ap> STATE");
-        	} else {
-        		System.out.println("INVALID ARGUMENTS");
-        		return;
-        	}
+        if (!checkArguments(subProtocol, args)) {
+            if (subProtocol.equalsIgnoreCase("backup")) {
+                System.out.println("Client <peer_ap> BACKUP <file_path> <replication_degree>");
+            } else if (subProtocol.equalsIgnoreCase("restore")) {
+                System.out.println("Client <peer_ap> RESTORE <file_path>");
+            } else if (subProtocol.equalsIgnoreCase("delete")) {
+                System.out.println("Client <peer_ap> DELETE <file_path>");
+            } else if (subProtocol.equalsIgnoreCase("reclaim")) {
+                System.out.println("Client <peer_ap> RECLAIM <mem_space>");
+            } else if (subProtocol.equalsIgnoreCase("state")) {
+                System.out.println("Client <peer_ap> STATE");
+            } else {
+                System.out.println("INVALID ARGUMENTS");
+                return;
+            }
         }
         String opnd1 = null;
         if (args.length >= 3)
@@ -50,7 +50,7 @@ public class Client {
             peerRemoteObjName = st.nextToken();
         } else
             throw new IllegalArgumentException("Invalid peer access point.");
-        
+
 
         try {
             Registry r = LocateRegistry.getRegistry(peerHostName, Integer.parseInt(peerRemoteObjName));    // port defined by 'peerRemoteObjName'
@@ -93,19 +93,19 @@ public class Client {
     private static void retrieveState(ServerRMI serverRMI) throws RemoteException {
         System.out.println(serverRMI.state());
     }
-    
+
     private static boolean checkArguments(String subprotocol, String args[]) {
-    	if(subprotocol.equalsIgnoreCase("backup"))
-    			return args.length == 4;
-    	else if(subprotocol.equalsIgnoreCase("restore"))
-    			return args.length == 3;
-    	else if(subprotocol.equalsIgnoreCase("delete"))
-    			return args.length == 3;
-    	else if(subprotocol.equalsIgnoreCase("reclaim"))
-    			return args.length == 3;
-    	else if(subprotocol.equalsIgnoreCase("state"))
-    			return args.length == 2;
-    	else
-    		return false;
+        if (subprotocol.equalsIgnoreCase("backup"))
+            return args.length == 4;
+        else if (subprotocol.equalsIgnoreCase("restore"))
+            return args.length == 3;
+        else if (subprotocol.equalsIgnoreCase("delete"))
+            return args.length == 3;
+        else if (subprotocol.equalsIgnoreCase("reclaim"))
+            return args.length == 3;
+        else if (subprotocol.equalsIgnoreCase("state"))
+            return args.length == 2;
+        else
+            return false;
     }
 }

@@ -46,11 +46,11 @@ public class Multicast {
             data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
             return data;
         } catch (IOException e) {
-        	return null;
+            return null;
         }
     }
-    
-    public byte[] receive(int blockingTime) throws SocketException{
+
+    public byte[] receive(int blockingTime) throws SocketException {
         socket.setSoTimeout(blockingTime);
         byte[] data = receive();
         socket.setSoTimeout(0);

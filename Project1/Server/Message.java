@@ -14,7 +14,7 @@ public class Message {
     private static final int SM_LF1 = 2;
     private static final int SM_CR2 = 3;
     private static final int SM_LF2 = 4;
-    
+
     private String messageType; //8 characters
     private String version; // <n>.<m> -> 3 characters
     private String senderId;    // Not negative integer
@@ -52,7 +52,7 @@ public class Message {
                 throw new IllegalArgumentException("Invalid replicationDeg (must be in [1,9]).");
         }
     }
-    
+
     public String getMessageType() {
         return messageType;
     }

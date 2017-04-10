@@ -2,39 +2,39 @@ package Project1.Server;
 
 import Project1.General.Constants;
 
-import java.io.*;
-import java.rmi.RemoteException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 
 /* Generic received message: PUTCHUNK <Version> <SenderId> <FileId> <ChunkNo> <ReplicationDeg> <CRLF><CRLF><Body> */
 
 public class ServerFileBackup {
-	
-	public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) {
-		serverObject.getDb().addOrUpdateBackedUpFileData(filePath, fileId, replicationDegree);
 
-		try {
-			FileInputStream fis = new FileInputStream(filePath);
+    public static void backup(ServerObject serverObject, String filePath, String fileId, int replicationDegree) {
+        serverObject.getDb().addOrUpdateBackedUpFileData(filePath, fileId, replicationDegree);
 
-			int bytesRead = Constants.maxChunkSize;
+        try {
+            FileInputStream fis = new FileInputStream(filePath);
 
-			for (int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++) {
-				byte[] chunkData = new byte[Constants.maxChunkSize];
-				bytesRead = fis.read(chunkData);
-				System.out.println("Chunk number:" + chunkNumber);
+            int bytesRead = Constants.maxChunkSize;
 
-				//Send data to Chunk Backup
-				if (bytesRead > 0 && bytesRead != Constants.maxChunkSize)
-					chunkData = Arrays.copyOf(chunkData, bytesRead);
-				ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
-			}
+            for (int chunkNumber = 0; bytesRead == Constants.maxChunkSize; chunkNumber++) {
+                byte[] chunkData = new byte[Constants.maxChunkSize];
+                bytesRead = fis.read(chunkData);
 
-			fis.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+                //Send data to Chunk Backup
+                if (bytesRead > 0 && bytesRead != Constants.maxChunkSize)
+                    chunkData = Arrays.copyOf(chunkData, bytesRead);
+                ServerChunkBackup.putChunk(serverObject, fileId, chunkData, replicationDegree, chunkNumber);
+            }
 
-	}
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

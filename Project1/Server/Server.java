@@ -2,12 +2,10 @@ package Project1.Server;
 
 import Project1.Database.ServerDatabase;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -53,43 +51,43 @@ public class Server {
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
             Registry r = LocateRegistry.createRegistry(Integer.parseInt(remoteObjName));    // port defined by 'remoteObjName'
 
-	        Timer timer1 = new Timer();
-	        TimerTask timerTask1 = new TimerTask() {
-	            @Override
-	            public void run() {
-	                ServerChunkBackup.storeChunk(serverObj);
-	            }
-	        };
-	        timer1.schedule(timerTask1, 0);
+            Timer timer1 = new Timer();
+            TimerTask timerTask1 = new TimerTask() {
+                @Override
+                public void run() {
+                    ServerChunkBackup.storeChunk(serverObj);
+                }
+            };
+            timer1.schedule(timerTask1, 0);
 
-	        Timer timer2 = new Timer();
-	        TimerTask timerTask2 = new TimerTask() {
-	            @Override
-	            public void run() {
-	                ServerChunkRestore.chunkProvider(serverObj);
-	            }
-	        };
-	        timer2.schedule(timerTask2, 0);
+            Timer timer2 = new Timer();
+            TimerTask timerTask2 = new TimerTask() {
+                @Override
+                public void run() {
+                    ServerChunkRestore.chunkProvider(serverObj);
+                }
+            };
+            timer2.schedule(timerTask2, 0);
 
-	        Timer timer3 = new Timer();
-	        TimerTask timerTask3 = new TimerTask() {
-	            @Override
-	            public void run() {
-	                ServerFileDeletion.fileChunksDeleter(serverObj);
-	            }
-	        };
-	        timer3.schedule(timerTask3, 0);
+            Timer timer3 = new Timer();
+            TimerTask timerTask3 = new TimerTask() {
+                @Override
+                public void run() {
+                    ServerFileDeletion.fileChunksDeleter(serverObj);
+                }
+            };
+            timer3.schedule(timerTask3, 0);
 
-	        Timer timer4 = new Timer();
-	        TimerTask timerTask4 = new TimerTask() {
-	            @Override
-	            public void run() {
-	                ServerSpaceReclaiming.monitorStorageSpaceChanges(serverObj);
-	            }
-	        };
-	        timer4.schedule(timerTask4, 0);
+            Timer timer4 = new Timer();
+            TimerTask timerTask4 = new TimerTask() {
+                @Override
+                public void run() {
+                    ServerSpaceReclaiming.monitorStorageSpaceChanges(serverObj);
+                }
+            };
+            timer4.schedule(timerTask4, 0);
 
-            if(!protocolVersion.equalsIgnoreCase("1.0")) {
+            if (!protocolVersion.equalsIgnoreCase("1.0")) {
                 Timer timer5 = new Timer();
                 TimerTask timerTask = new TimerTask() {
                     @Override

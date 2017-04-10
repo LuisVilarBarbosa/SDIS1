@@ -3,8 +3,6 @@ package Project1.Server;
 import Project1.Database.ServerDatabase;
 import Project1.General.SHA256;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -35,7 +33,7 @@ public class ServerObject implements ServerRMI {
 
     	//If file exists, we assume that is outdated
     	if(this.db.getBackedUpFileId(filePath) != null) {
-    		delete(filePath);
+            delete(filePath);
     	}
     	
     	String fileId = calculateFileId(filePath, date.toString());

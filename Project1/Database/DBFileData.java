@@ -10,7 +10,7 @@ public class DBFileData {
     private HashMap<Integer, FileChunkData> fileChunksData;
 
     public DBFileData(String filePath, String fileId, int desiredReplicationDegree) {
-        if(filePath == null || filePath == "")
+        if (filePath == null || filePath == "")
             this.filePath = " ";    // necessary when loading tokens from the file on ServerDatabase
         else
             this.filePath = filePath;

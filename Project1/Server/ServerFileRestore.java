@@ -10,20 +10,20 @@ public class ServerFileRestore {
 
     public static void restore(ServerObject serverObject, String filePath, String fileId) {
 
-        if(serverObject.getDb().getBackedUpFileData(fileId) == null) {
+        if (serverObject.getDb().getBackedUpFileData(fileId) == null) {
             System.out.println("The file '" + filePath + "' was not stored by this server.");
             return;
         }
 
         String folderPath = null;
-        for(int i = filePath.length() - 1; i >= 0; i--)
-            if(filePath.charAt(i) == '/' || filePath.charAt(i) == '\\') {
+        for (int i = filePath.length() - 1; i >= 0; i--)
+            if (filePath.charAt(i) == '/' || filePath.charAt(i) == '\\') {
                 folderPath = filePath.substring(0, i);
                 break;
             }
 
         File file = new File(folderPath);
-        if(!file.exists()) {
+        if (!file.exists()) {
             if (file.mkdirs())
                 System.out.println("Restore: '" + folderPath + "' directory successfully created.");
             else
@@ -38,11 +38,10 @@ public class ServerFileRestore {
 
             do {
                 data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
-                if(data == null) {
+                if (data == null) {
                     error = true;
                     System.out.println("The chunk no. " + chunkNo + " was not retrieved.");
-                }
-                else {
+                } else {
                     fileOutputStream.write(data);
                     chunkNo++;
                 }
@@ -50,7 +49,7 @@ public class ServerFileRestore {
 
             fileOutputStream.close();
 
-            if(error)
+            if (error)
                 new File(filePath).delete();
         } catch (IOException e) {
             e.printStackTrace();

@@ -41,7 +41,7 @@ public class ServerSpaceReclaiming {
                 FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
                 dbFileData.removeFileChunkData(chunkNo);
                 usedStorage -= fileChunkData.getSize();
-                if(db.getStoredFileData(fileId).getNumFileChunks() == 0)
+                if (db.getStoredFileData(fileId).getNumFileChunks() == 0)
                     db.removeStoredFile(fileId);
 
                 // send "removed" message to the other peers
