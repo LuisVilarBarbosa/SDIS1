@@ -10,6 +10,11 @@ public class ServerFileRestore {
 
     public static void restore(ServerObject serverObject, String filePath, String fileId) {
 
+        if(serverObject.getDb().getBackedUpFileData(fileId) == null) {
+            System.out.println("The file '" + filePath + "' was not stored by this server.");
+            return;
+        }
+
         String folderPath = null;
         for(int i = filePath.length() - 1; i >= 0; i--)
             if(filePath.charAt(i) == '/' || filePath.charAt(i) == '\\') {
@@ -29,14 +34,24 @@ public class ServerFileRestore {
             FileOutputStream fileOutputStream = new FileOutputStream(filePath);
             byte[] data;
             int chunkNo = 0;
+            boolean error = false;
 
             do {
                 data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
-                fileOutputStream.write(data);
-                chunkNo++;
+                if(data == null) {
+                    error = true;
+                    System.out.println("The chunk no. " + chunkNo + " was not retrieved.");
+                }
+                else {
+                    fileOutputStream.write(data);
+                    chunkNo++;
+                }
             } while (data.length == Constants.maxChunkSize);
 
             fileOutputStream.close();
+
+            if(error)
+                new File(filePath).delete();
         } catch (IOException e) {
             e.printStackTrace();
         }
