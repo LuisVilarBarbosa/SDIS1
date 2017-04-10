@@ -105,7 +105,8 @@ public class ServerChunkBackup {
 
 			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
 				Random randomGenerator = new Random();
-				int delay = randomGenerator.nextInt(Constants.maxDelayTime);
+				int delay = randomGenerator.nextInt(Constants.maxDelayTime*3);
+				long init = System.currentTimeMillis();
 				long delayEnding = System.currentTimeMillis() + delay;
 				int actualReplicationDegree = 0;
 
@@ -113,13 +114,14 @@ public class ServerChunkBackup {
 				while (System.currentTimeMillis() < delayEnding) {
 					try {
 						byte[] msg = mControlCh.receive(delay);
-						if (msg != null && new Message(msg).getChunkNo() == m.getChunkNo())
+						if(msg != null)
+							System.out.println("FOUND MESSAGE FROM " + new Message(msg).getSenderId());
+						if (msg != null && new Message(msg).getChunkNo().equals(m.getChunkNo()))
 							actualReplicationDegree++;
 					} catch (SocketException e) {
 						break;
 					}
 				}
-
 				//Creates and writes content to file. In enhanced protocols, this only happens if replicationDegree is not satisfied
 				if (serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())) {
 					try {
@@ -143,18 +145,20 @@ public class ServerChunkBackup {
 						append(m.getChunkNo()).append("\r\n\r\n");
 
 				mControlCh.send(headerBuilder.toString().getBytes());
-
+				
 				//Put fileInfo in the database
-				FileChunkData chunkData = new FileChunkData(
-						Integer.parseInt(m.getChunkNo()),
-						m.getBody().length,
-						actualReplicationDegree);
-				DBFileData dbFileData = db.getStoredFileData(m.getFileId());
-				if(dbFileData == null) {
-					db.addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
-					dbFileData = db.getStoredFileData(m.getFileId());
+				if (serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())){
+					FileChunkData chunkData = new FileChunkData(
+							Integer.parseInt(m.getChunkNo()),
+							m.getBody().length,
+							actualReplicationDegree);
+					DBFileData dbFileData = db.getStoredFileData(m.getFileId());
+					if(dbFileData == null) {
+						db.addOrUpdateStoredFileData(m.getFileId(), Integer.parseInt(m.getReplicationDeg()));
+						dbFileData = db.getStoredFileData(m.getFileId());
+					}
+					dbFileData.addOrUpdateFileChunkData(chunkData);
 				}
-				dbFileData.addOrUpdateFileChunkData(chunkData);
 			}
 		}
 	}
