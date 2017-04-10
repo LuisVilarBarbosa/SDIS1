@@ -30,17 +30,14 @@ public class ServerFileRestore {
             byte[] data;
             int chunkNo = 0;
 
-            do {
-                data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
+            while ((data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo)) != null && data.length == Constants.maxChunkSize) {
                 fileOutputStream.write(data);
                 chunkNo++;
-            } while (data.length == Constants.maxChunkSize);
+            }
 
             fileOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.err.println("Probably the file does not exist.");
         }
     }
 }

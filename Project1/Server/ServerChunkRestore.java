@@ -1,5 +1,6 @@
 package Project1.Server;
 
+import Project1.Database.DBFileData;
 import Project1.Database.ServerDatabase;
 import Project1.General.Paths;
 import Project1.General.Constants;
@@ -28,6 +29,8 @@ public class ServerChunkRestore {
 
         try {
             byte[] data = mDataRecoveryCh.receive(Constants.maxWaitTime);
+            if(data == null)
+                return null;
             Message m = new Message(data);
             return m.getBody();
         } catch (SocketException e) {
@@ -49,11 +52,13 @@ public class ServerChunkRestore {
                 Message m = new Message(request1);
 
                 //Notification that other server has attended the request first
-                byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt() % Constants.maxDelayTime);
+                byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt(Constants.maxDelayTime));
 
                 if(request2 != null) {
                     Message m2 = new Message(request2);
-                    if (m2.getMessageType().equalsIgnoreCase("CHUNK")) //If the other server attended the same request
+                    if (m2.getMessageType().equalsIgnoreCase("CHUNK") &&
+                            m2.getFileId().equals(m.getFileId()) &&
+                            m2.getChunkNo().equalsIgnoreCase(m.getChunkNo())) //If the other server attended the same request
                         continue;
                 }
 
@@ -61,7 +66,8 @@ public class ServerChunkRestore {
                     String fileId = m.getFileId();
                     int chunkNo = Integer.parseInt(m.getChunkNo());
 
-                    if(db.getStoredFileData(fileId).getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
+                    DBFileData dbFileData = db.getStoredFileData(fileId);
+                    if(dbFileData != null && dbFileData.getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
                         String path = Paths.getChunkPath(serverId, fileId, chunkNo);
                         FileInputStream file = new FileInputStream(path);
                         file.read(data);
