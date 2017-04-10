@@ -103,6 +103,11 @@ public class ServerChunkBackup {
 		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
 			System.out.println("Received: " + m.getHeader());
+			
+			if(m.getSenderId().equals(serverObject.getServerId())){
+				System.out.println("Message from myself. Ignoring...");
+				continue;
+			}
 
 			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
 				int delay = new Random().nextInt(Constants.maxDelayTime);
