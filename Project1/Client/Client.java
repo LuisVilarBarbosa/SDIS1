@@ -68,7 +68,7 @@ public class Client {
                 retrieveState(serverRMI);
 
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         } catch (NotBoundException e) {
             e.printStackTrace();
         }

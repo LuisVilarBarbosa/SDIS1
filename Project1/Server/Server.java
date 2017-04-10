@@ -91,7 +91,7 @@ public class Server {
 
             r.rebind(remoteObjName, serverRMI);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }
