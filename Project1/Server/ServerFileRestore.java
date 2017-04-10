@@ -30,10 +30,11 @@ public class ServerFileRestore {
             byte[] data;
             int chunkNo = 0;
 
-            while ((data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo)) != null && data.length == Constants.maxChunkSize) {
+            do {
+                data = ServerChunkRestore.requestChunk(serverObject, fileId, chunkNo);
                 fileOutputStream.write(data);
                 chunkNo++;
-            }
+            } while (data.length == Constants.maxChunkSize);
 
             fileOutputStream.close();
         } catch (IOException e) {

@@ -70,7 +70,7 @@ public class ServerChunkRestore {
                     if(dbFileData != null && dbFileData.getFileChunkData(chunkNo) != null) {    // if this server stored the chunk
                         String path = Paths.getChunkPath(serverId, fileId, chunkNo);
                         FileInputStream file = new FileInputStream(path);
-                        file.read(data);
+                        int bytesRead = file.read(data);
                         file.close();
 
                         StringBuilder headerToSend = new StringBuilder("CHUNK ");
@@ -78,7 +78,7 @@ public class ServerChunkRestore {
 
                         ByteArrayOutputStream msg = new ByteArrayOutputStream();
                         msg.write(headerToSend.toString().getBytes());
-                        msg.write(data);
+                        msg.write(data, 0, bytesRead);
                         mDataRecoveryCh.send(msg.toByteArray());
                         msg.close();
                     }
