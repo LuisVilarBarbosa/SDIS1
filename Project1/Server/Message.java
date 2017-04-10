@@ -25,11 +25,11 @@ public class Message {
 
     public Message(byte[] message) {
         byte[][] msgSplitted = splitHeaderFromBody(message);
-        String msgStr = new String(msgSplitted[0]);
+        String header = new String(msgSplitted[0]);
         body = msgSplitted[1];
 
         Pattern p = Pattern.compile("^\\s*(\\w+)\\s+(\\d.\\d)\\s+(\\d+)\\s+(\\w{64})(?:\\s+(\\d{1,6})(?:\\s+(\\d+))?)?\\s*$");
-        Matcher m = p.matcher(msgStr);
+        Matcher m = p.matcher(header);
 
         if (!m.matches())
             throw new IllegalArgumentException(genericErrorMsg);

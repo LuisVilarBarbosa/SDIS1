@@ -43,24 +43,26 @@ public class ServerObject implements ServerRMI {
     }
 
     public void restore(String filePath) throws RemoteException {
-        // Concurrency is missing
         String fileId = db.getBackedUpFileId(filePath);
-        ServerFileRestore.restore(this, filePath, fileId);
+        if(fileId == null)
+            showFileIdError(filePath);
+        else
+            ServerFileRestore.restore(this, filePath, fileId);
     }
 
     public void delete(String filePath) throws RemoteException {
-        // Concurrency is missing
         String fileId = db.getBackedUpFileId(filePath);
-        ServerFileDeletion.requestDeletion(this, fileId);
+        if(fileId == null)
+            showFileIdError(filePath);
+        else
+            ServerFileDeletion.requestDeletion(this, fileId);
     }
 
     public void manageStorage(long newStorageSpace) throws RemoteException {
-        // Concurrency is missing
         ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace * 1000); // passing KBytes to bytes
     }
 
     public String state() throws RemoteException {
-        // Concurrency is missing
         return ServerState.retrieveState(this);
     }
 
@@ -80,4 +82,8 @@ public class ServerObject implements ServerRMI {
     public Multicast getDataBackupChannel() { return mDataBackupCh.clone(); }
     public Multicast getDataRecoveryChannel() { return mDataRecoveryCh.clone(); }
     public ServerDatabase getDb() { return db; }
+
+    private void showFileIdError(String filePath) {
+        System.out.println("The requested file does not exist: " + filePath);
+    }
 }

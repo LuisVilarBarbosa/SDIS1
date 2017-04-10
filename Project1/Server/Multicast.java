@@ -46,7 +46,6 @@ public class Multicast {
             data = Arrays.copyOfRange(mcastReceive.getData(), 0, mcastReceive.getLength());
             return data;
         } catch (IOException e) {
-        	System.out.println("Timeout expired, did not receive anything");
         	return null;
         }
     }

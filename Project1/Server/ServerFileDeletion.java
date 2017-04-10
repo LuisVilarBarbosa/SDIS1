@@ -13,6 +13,7 @@ public class ServerFileDeletion {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
         Multicast mControlCh = serverObject.getControlChannel();
+        serverObject.getDb().removeBackedUpFile(fileId);
 
         StringBuilder st = new StringBuilder("DELETE ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
@@ -45,15 +46,16 @@ public class ServerFileDeletion {
     private static boolean deleteDirectory(File directory) {
         if(directory.exists()){
             File[] files = directory.listFiles();
-            if(null != files) {
-                for(int i = 0; i < files.length; i++) {
-                    if(files[i].isDirectory())
-                        deleteDirectory(files[i]);
+            if(files != null) {
+                for(File file : files) {
+                    if(file.isDirectory())
+                        deleteDirectory(file);
                     else
-                        files[i].delete();
+                        file.delete();
                 }
             }
+            return directory.delete();
         }
-        return directory.delete();
+        return true;
     }
 }

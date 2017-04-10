@@ -163,6 +163,10 @@ public class ServerDatabase {
         return filesIds;
     }
 
+    public void removeBackedUpFile(String fileId) {
+        backedUpFiles.remove(fileId);
+    }
+
     public void removeStoredFile(String fileId) {
         storedFiles.remove(fileId);
     }

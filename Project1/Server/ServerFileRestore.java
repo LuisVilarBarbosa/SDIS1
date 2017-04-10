@@ -39,8 +39,6 @@ public class ServerFileRestore {
             fileOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {
-            System.err.println("Probably the file does not exist.");
         }
     }
 }
