@@ -24,6 +24,7 @@ public class ServerFileDeletion {
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
         String msg = st.toString();
         mControlCh.send(msg.getBytes());
+        System.out.println("Sent: " + msg);
 
         if(!serverObject.getProtocolVersion().equalsIgnoreCase("1.0"))
             someOldMessages.put(msg, System.currentTimeMillis());
@@ -40,6 +41,7 @@ public class ServerFileDeletion {
                 Message m = new Message(request);
 
                 if (m.getMessageType().equalsIgnoreCase("DELETE") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
+                    System.out.println("Received: " + m.getHeader());
                     String fileId = m.getFileId();
 
                     String path = Paths.getFolderPath(serverId, fileId);
@@ -60,6 +62,7 @@ public class ServerFileDeletion {
             long currentTime = System.currentTimeMillis();
             for (String msg : someOldMessages.keySet()) {
                 mControlChannel.send(msg.getBytes());
+                System.out.println("Sent: " + msg);
                 if (someOldMessages.get(msg) < currentTime - messageExpirationTime)
                     someOldMessages.remove(msg);
             }

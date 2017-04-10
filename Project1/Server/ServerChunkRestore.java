@@ -25,13 +25,16 @@ public class ServerChunkRestore {
 
         StringBuilder st = new StringBuilder("GETCHUNK ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
-        mControlCh.send(st.toString().getBytes());
+        String msg1 = st.toString();
+        mControlCh.send(msg1.getBytes());
+        System.out.println("Sent: " + msg1);
 
         try {
             byte[] data = mDataRecoveryCh.receive(Constants.maxWaitTime);
             if(data == null)
                 return null;
             Message m = new Message(data);
+            System.out.println("Received: " + m.getHeader());
             return m.getBody();
         } catch (SocketException e) {
             return null;
@@ -50,12 +53,14 @@ public class ServerChunkRestore {
             try {
                 byte[] request1 = mControlCh.receive(); //Restore request
                 Message m = new Message(request1);
+                System.out.println("Received: " + m.getHeader());
 
                 //Notification that other server has attended the request first
                 byte[] request2 = mDataRecoveryCh.receive(new Random().nextInt(Constants.maxDelayTime));
 
                 if(request2 != null) {
                     Message m2 = new Message(request2);
+                    System.out.println("Received: " + m2.getHeader());
                     if (m2.getMessageType().equalsIgnoreCase("CHUNK") &&
                             m2.getFileId().equals(m.getFileId()) &&
                             m2.getChunkNo().equalsIgnoreCase(m.getChunkNo())) //If the other server attended the same request
@@ -75,12 +80,14 @@ public class ServerChunkRestore {
 
                         StringBuilder headerToSend = new StringBuilder("CHUNK ");
                         headerToSend.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
+                        String header = headerToSend.toString();
 
                         ByteArrayOutputStream msg = new ByteArrayOutputStream();
-                        msg.write(headerToSend.toString().getBytes());
+                        msg.write(header.getBytes());
                         msg.write(data, 0, bytesRead);
                         mDataRecoveryCh.send(msg.toByteArray());
                         msg.close();
+                        System.out.println("Sent: " + header);
                     }
                 }
             } catch (FileNotFoundException e) {

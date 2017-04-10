@@ -20,7 +20,7 @@ public class ServerChunkBackup {
 	
 	public static void putChunk(ServerObject serverObject, String fileId, byte[] data, int replicationDegree, int chunkNumber) {
 		if(data == null) {
-			System.err.println("PutChunk : data = null not accepted.");
+			System.err.println("PutChunk: data = null not accepted.");
 			return;
 		}
 		String protocolVersion = serverObject.getProtocolVersion();
@@ -34,13 +34,15 @@ public class ServerChunkBackup {
 		append(chunkNumber).append(" ").
 		append(replicationDegree).append("\r\n\r\n");
 
-		byte[] header = headerBuilder.toString().getBytes();
-		byte[] chunk = new byte[header.length + data.length];
-		System.arraycopy(header, 0, chunk, 0, header.length);
-		System.arraycopy(data, 0, chunk, header.length, data.length);
+		String header = headerBuilder.toString();
+		byte[] headerBytes = header.getBytes();
+		byte[] chunk = new byte[headerBytes.length + data.length];
+		System.arraycopy(headerBytes, 0, chunk, 0, headerBytes.length);
+		System.arraycopy(data, 0, chunk, headerBytes.length, data.length);
 
 		//Send the chunk
 		mDataBackupCh.send(chunk);
+		System.out.println("Sent: " + header);
 		
 		//Wait in the control channel for STORED messages
 		// - Count number of STORED's received in 1 sec
@@ -57,6 +59,7 @@ public class ServerChunkBackup {
 					byte[] msg = mControlCh.receive(waitTime);
 					if(msg != null) {
 						Message m = new Message(msg);
+						System.out.println("Received: " + m.getHeader());
 						if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
 							storedConfirmations.add(m);
 					}
@@ -92,21 +95,17 @@ public class ServerChunkBackup {
 		// - Update peer's database
 
 		String protocolVersion = serverObject.getProtocolVersion();
-		int serverId = serverObject.getServerId();    // not used, but should be used to send STORED message
+		int serverId = serverObject.getServerId();
 		Multicast mControlCh = serverObject.getControlChannel();
 		Multicast mDataBackupCh = serverObject.getDataBackupChannel();
 		ServerDatabase db = serverObject.getDb();
 
 		while (true) {
 			Message m = new Message(mDataBackupCh.receive());
-			//To avoid receiving messages from himself
-			if(Integer.parseInt(m.getSenderId()) == serverObject.getServerId())
-				continue;
+			System.out.println("Received: " + m.getHeader());
 
 			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
-				Random randomGenerator = new Random();
-				int delay = randomGenerator.nextInt(Constants.maxDelayTime*3);
-				long init = System.currentTimeMillis();
+				int delay = new Random().nextInt(Constants.maxDelayTime);
 				long delayEnding = System.currentTimeMillis() + delay;
 				int actualReplicationDegree = 0;
 
@@ -117,7 +116,7 @@ public class ServerChunkBackup {
 						Message feedbackMessage;
 						if(msg != null){
 							feedbackMessage = new Message(msg);
-							System.out.println("FOUND MESSAGE FROM " + feedbackMessage.getSenderId());
+							System.out.println("Received: " + feedbackMessage.getHeader());
 							if (feedbackMessage.getChunkNo().equals(m.getChunkNo()))
 								actualReplicationDegree++;
 						}
@@ -134,7 +133,7 @@ public class ServerChunkBackup {
 						fileStream.write(m.getBody());
 						fileStream.close();
 					} catch (IOException e) {
-						//TODO Could not write/create file message?
+						System.err.println("Unable to write the received chunk to a file.");
 						e.printStackTrace();
 						continue;
 					}
@@ -147,7 +146,9 @@ public class ServerChunkBackup {
 						append(m.getFileId()).append(" ").
 						append(m.getChunkNo()).append("\r\n\r\n");
 
-				mControlCh.send(headerBuilder.toString().getBytes());
+				String header = headerBuilder.toString();
+				mControlCh.send(header.getBytes());
+				System.out.println("Sent: " + header);
 				
 				//Put fileInfo in the database
 				if (serverObject.getProtocolVersion().equals("1.0") || actualReplicationDegree < Integer.parseInt(m.getReplicationDeg())){

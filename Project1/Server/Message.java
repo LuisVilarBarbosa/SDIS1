@@ -21,11 +21,12 @@ public class Message {
     private String fileId;  // SHA256 ASCII string
     private String chunkNo; // Not negative integer not larger than 6 chars
     private String replicationDeg;  // Number in [1,9]
+    private String header;
     private byte[] body;
 
     public Message(byte[] message) {
         byte[][] msgSplitted = splitHeaderFromBody(message);
-        String header = new String(msgSplitted[0]);
+        header = new String(msgSplitted[0]);
         body = msgSplitted[1];
 
         Pattern p = Pattern.compile("^\\s*(\\w+)\\s+(\\d.\\d)\\s+(\\d+)\\s+(\\w{64})(?:\\s+(\\d{1,6})(?:\\s+(\\d+))?)?\\s*$");
@@ -74,6 +75,10 @@ public class Message {
 
     public String getReplicationDeg() {
         return replicationDeg;
+    }
+
+    public String getHeader() {
+        return header;
     }
 
     public byte[] getBody() {

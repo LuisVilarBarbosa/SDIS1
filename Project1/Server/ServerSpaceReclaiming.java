@@ -19,6 +19,7 @@ public class ServerSpaceReclaiming {
 
     public static void updateStorageSpace(ServerObject serverObject, long newStorageSpace) {
         int serverId = serverObject.getServerId();
+        Multicast mControlCh = serverObject.getControlChannel();
         ServerDatabase db = serverObject.getDb();
         db.setStorageCapacity(newStorageSpace);
 
@@ -46,6 +47,10 @@ public class ServerSpaceReclaiming {
                 StringBuilder sb = new StringBuilder("REMOVED ");
                 sb.append(serverObject.getProtocolVersion()).append(serverObject.getServerId()).append(fileId);
                 sb.append(chunkNo).append("\r\n\r\n");
+                String msg = sb.toString();
+                mControlCh.send(msg.getBytes());
+
+                System.out.println("Sent: " + msg);
             }
         }
     }
@@ -62,6 +67,7 @@ public class ServerSpaceReclaiming {
                 Message m1 = new Message(info1);
 
                 if (m1.getMessageType().equalsIgnoreCase("REMOVED") && m1.getVersion().equalsIgnoreCase(protocolVersion)) {
+                    System.out.println("Received: " + m1.getHeader());
                     String fileId = m1.getFileId();
                     int chunkNo = Integer.parseInt(m1.getChunkNo());
 
@@ -80,6 +86,7 @@ public class ServerSpaceReclaiming {
                     byte[] info2 = null;
                     mControlCh.receive(new Random().nextInt() % Constants.maxDelayTime);
                     Message m2 = new Message(info2);
+                    System.out.println(m2.getHeader());
                     if (m2.getMessageType().equalsIgnoreCase("PUTCHUNK") &&
                             m2.getVersion().equalsIgnoreCase(protocolVersion) &&
                             m2.getSenderId().equalsIgnoreCase(m1.getSenderId()) &&
