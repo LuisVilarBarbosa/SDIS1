@@ -13,6 +13,7 @@ public class ServerFileDeletion {
         String protocolVersion = serverObject.getProtocolVersion();
         int serverId = serverObject.getServerId();
         Multicast mControlCh = serverObject.getControlChannel();
+        serverObject.getDb().removeBackedUpFile(fileId);
 
         StringBuilder st = new StringBuilder("DELETE ");
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
