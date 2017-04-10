@@ -19,8 +19,8 @@ public class ServerState {
         sb.append("\r\nStored files:\r\n");
         generatePartialState(db, sb, storedFiles, false, true);
 
-        sb.append("\r\nStorage capacity: ").append(db.getStorageCapacity()).append(" KBytes\r\n");
-        sb.append("Used storage: ").append(db.getUsedStorage()).append(" KBytes\r\n");
+        sb.append("\r\nStorage capacity: ").append(db.getStorageCapacity() / 1000).append(" KBytes\r\n");
+        sb.append("Used storage: ").append(db.getUsedStorage() / 1000).append(" KBytes\r\n");
         return sb.toString();
     }
 
@@ -57,7 +57,7 @@ public class ServerState {
                 FileChunkData fileChunkData = dbFileData.getFileChunkData(chunkNo);
                 sb.append(fileChunkData.getChunkNo()).append(" ");
                 if (appendSize)
-                    sb.append(fileChunkData.getSize()).append(" ");
+                    sb.append(fileChunkData.getSize() / 1000).append(" ");
                 sb.append(fileChunkData.getPerceivedReplicationDegree()).append("\r\n");
             }
             sb.append("\r\n");

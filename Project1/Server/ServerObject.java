@@ -56,7 +56,7 @@ public class ServerObject implements ServerRMI {
 
     public void manageStorage(long newStorageSpace) throws RemoteException {
         // Concurrency is missing
-        ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace);
+        ServerSpaceReclaiming.updateStorageSpace(this, newStorageSpace * 1000); // passing KBytes to bytes
     }
 
     public String state() throws RemoteException {

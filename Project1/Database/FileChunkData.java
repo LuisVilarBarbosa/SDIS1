@@ -2,7 +2,7 @@ package Project1.Database;
 
 public class FileChunkData {
     private int chunkNo;
-    private long size;
+    private long size;  // bytes
     private int perceivedReplicationDegree;
 
     public FileChunkData(int chunkNo, long size, int perceivedReplicationDegree) {

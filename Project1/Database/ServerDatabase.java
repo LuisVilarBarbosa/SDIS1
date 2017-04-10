@@ -9,7 +9,7 @@ public class ServerDatabase {
     private static final int updateFilePeriod = 10000;  // milliseconds
     private static final String delim = "|";
     private final String dbPath;
-    private long storageCapacity = 1000000;    // KBytes (default defined for the first use)
+    private long storageCapacity = 1000000000;    // bytes (default defined for the first use)
     private HashMap<String, DBFileData> backedUpFiles = new HashMap<>();    // backed up to other peers
     private HashMap<String, DBFileData> storedFiles = new HashMap<>();  //<FileID, FileData>
 
