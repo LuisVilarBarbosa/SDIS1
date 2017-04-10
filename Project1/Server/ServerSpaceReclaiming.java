@@ -101,7 +101,7 @@ public class ServerSpaceReclaiming {
             } catch (FileNotFoundException e) {
             } catch (IOException e) {
             } catch (IllegalArgumentException e) {
-                System.err.println(e.getMessage());
+                e.printStackTrace();
             }
         }
     }
