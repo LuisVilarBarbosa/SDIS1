@@ -60,11 +60,14 @@ public class ServerChunkBackup {
 					byte[] msg = mControlCh.receive(waitTime);
 					if(msg != null) {
 						Message m = new Message(msg);
-						if(Integer.parseInt(m.getSenderId()) == serverId)
-							continue;
-						System.out.println("Received: " + m.getHeader());
-						if (m.getMessageType().equalsIgnoreCase("STORED") && m.getVersion().equalsIgnoreCase(protocolVersion))
+						if (m.getMessageType().equalsIgnoreCase("STORED") &&
+								Integer.parseInt(m.getSenderId()) != serverId &&
+								m.getVersion().equalsIgnoreCase(protocolVersion) &&
+								m.getFileId().equals(fileId) &&
+								Integer.parseInt(m.getChunkNo()) == chunkNumber) {
+							System.out.println("Received: " + m.getHeader());
 							storedConfirmations.add(m);
+						}
 					}
 				} catch (SocketException e) {
 					break;
