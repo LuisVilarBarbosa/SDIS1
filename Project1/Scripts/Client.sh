@@ -10,25 +10,27 @@ read -r subprotocol
 echo "Server to connect ([host:]Port): "
 read -r serverToConnect
 
-if [ "${subprotocol^^}" == "BACKUP" ]; then
+subprotocol=$(echo "$subprotocol" | sed 's/.*/\U&/')
+
+if [ "$subprotocol" = "BACKUP" ]; then
 	echo "File path: ";
     read -r filePath;
 	echo "Replication degree: ";
 	read -r replicationDegree;
     java Project1/Client/Client $serverToConnect $subprotocol $filePath $replicationDegree;
-elif [ "${subprotocol^^}" == "RESTORE" ]; then
+elif [ "$subprotocol" = "RESTORE" ]; then
 	echo "File path: ";
     read -r filePath;
     java Project1/Client/Client $serverToConnect $subprotocol $filePath;
-elif [ "${subprotocol^^}" == "DELETE" ]; then
+elif [ "$subprotocol" = "DELETE" ]; then
 	echo "File path: ";
     read -r filePath;
     java Project1/Client/Client $serverToConnect $subprotocol $filePath;
-elif [ "${subprotocol^^}" == "RECLAIM" ]; then
+elif [ "$subprotocol" = "RECLAIM" ]; then
 	echo "Number of KBytes: ";
 	read -r numKBytes;
     java Project1/Client/Client $serverToConnect $subprotocol $numKBytes;
-elif [ "${subprotocol^^}" == "STATE" ]; then
+elif [ "$subprotocol" = "STATE" ]; then
     java Project1/Client/Client $serverToConnect $subprotocol;
 else
     echo "Invalid subprotocol.";
