@@ -53,8 +53,7 @@ public class ServerChunkBackup {
 		int retries = 0;
 		long lastTime = System.currentTimeMillis();
 		long elapsedTime = 0;
-		while(retries < 5)
-		{
+		while(retries < 5) {
 			while(elapsedTime < waitTime) {
 				try {
 					byte[] msg = mControlCh.receive(waitTime);
@@ -72,7 +71,6 @@ public class ServerChunkBackup {
 				} catch (SocketException e) {
 					break;
 				}
-
 				elapsedTime += System.currentTimeMillis() - lastTime;
 				lastTime = System.currentTimeMillis();
 			}
@@ -110,10 +108,7 @@ public class ServerChunkBackup {
 			Message m = new Message(mDataBackupCh.receive());
 			System.out.println("Received: " + m.getHeader());
 
-			if(Integer.parseInt(m.getSenderId()) == serverId)
-				continue;
-
-			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion)) {
+			if (m.getMessageType().equalsIgnoreCase("PUTCHUNK") && m.getVersion().equalsIgnoreCase(protocolVersion) && Integer.parseInt(m.getSenderId()) != serverId) {
 				int delay = new Random().nextInt(Constants.maxDelayTime);
 				long delayEnding = System.currentTimeMillis() + delay;
 				int actualReplicationDegree = 0;
@@ -127,9 +122,9 @@ public class ServerChunkBackup {
 							feedbackMessage = new Message(msg);
 							if (feedbackMessage.getMessageType().equalsIgnoreCase("STORED") &&
 									feedbackMessage.getVersion().equalsIgnoreCase(protocolVersion) &&
-									Integer.parseInt(m.getSenderId()) != serverId &&
+									Integer.parseInt(feedbackMessage.getSenderId()) != serverId &&
 									feedbackMessage.getFileId().equals(m.getFileId()) &&
-									feedbackMessage.getChunkNo().equals(m.getChunkNo())) {
+									feedbackMessage.getChunkNo().equalsIgnoreCase(m.getChunkNo())) {
 								System.out.println("Received: " + feedbackMessage.getHeader());
 								actualReplicationDegree++;
 							}
