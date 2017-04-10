@@ -114,10 +114,13 @@ public class ServerChunkBackup {
 				while (System.currentTimeMillis() < delayEnding) {
 					try {
 						byte[] msg = mControlCh.receive(delay);
-						if(msg != null)
-							System.out.println("FOUND MESSAGE FROM " + new Message(msg).getSenderId());
-						if (msg != null && new Message(msg).getChunkNo().equals(m.getChunkNo()))
-							actualReplicationDegree++;
+						Message feedbackMessage;
+						if(msg != null){
+							feedbackMessage = new Message(msg);
+							System.out.println("FOUND MESSAGE FROM " + feedbackMessage.getSenderId());
+							if (feedbackMessage.getChunkNo().equals(m.getChunkNo()))
+								actualReplicationDegree++;
+						}
 					} catch (SocketException e) {
 						break;
 					}
