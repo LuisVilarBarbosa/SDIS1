@@ -14,7 +14,7 @@ public class ServerState {
         ServerDatabase db = serverObject.getDb();
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Backed up files:\r\n");
+        sb.append("\r\nBacked up files:\r\n");
         generatePartialState(db, sb, backedUpFiles, true, false);
         sb.append("\r\nStored files:\r\n");
         generatePartialState(db, sb, storedFiles, false, true);
