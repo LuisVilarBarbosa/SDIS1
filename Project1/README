@@ -1,5 +1,4 @@
-Instructions
-_____
+**Instructions**
 
 On the "Scripts" folder, there is a set of scripts that will help to use the program. Those which extension is ".ps1" are for Powershell and those which extension is ".sh" are for Bash. They do the same thing. For generic purposes, we will indicate ".ext" to reference ".ps1" and ".sh".
  - The first thing to do is to execute the script "Compile.ext".
