@@ -104,7 +104,7 @@ public class ServerChunkBackup {
 			Message m = new Message(mDataBackupCh.receive());
 			System.out.println("Received: " + m.getHeader());
 			
-			if(m.getSenderId().equals(serverObject.getServerId())){
+			if(Integer.parseInt(m.getSenderId()) == serverId){
 				System.out.println("Message from myself. Ignoring...");
 				continue;
 			}
