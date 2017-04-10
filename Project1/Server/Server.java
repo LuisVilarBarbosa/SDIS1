@@ -52,7 +52,7 @@ public class Server {
             ServerObject serverObj = new ServerObject(protocolVersion, serverId, mControlCh, mDataBackupCh, mDataRecoveryCh, db);
             ServerRMI serverRMI = (ServerRMI) UnicastRemoteObject.exportObject(serverObj, 0);
             Registry r = LocateRegistry.createRegistry(Integer.parseInt(remoteObjName));    // port defined by 'remoteObjName'
-        	
+
 	        Timer timer1 = new Timer();
 	        TimerTask timerTask1 = new TimerTask() {
 	            @Override
@@ -61,7 +61,7 @@ public class Server {
 	            }
 	        };
 	        timer1.schedule(timerTask1, 0);
-	
+
 	        Timer timer2 = new Timer();
 	        TimerTask timerTask2 = new TimerTask() {
 	            @Override
@@ -70,7 +70,7 @@ public class Server {
 	            }
 	        };
 	        timer2.schedule(timerTask2, 0);
-	
+
 	        Timer timer3 = new Timer();
 	        TimerTask timerTask3 = new TimerTask() {
 	            @Override
@@ -79,7 +79,7 @@ public class Server {
 	            }
 	        };
 	        timer3.schedule(timerTask3, 0);
-	
+
 	        Timer timer4 = new Timer();
 	        TimerTask timerTask4 = new TimerTask() {
 	            @Override
@@ -88,6 +88,18 @@ public class Server {
 	            }
 	        };
 	        timer4.schedule(timerTask4, 0);
+
+            if(!protocolVersion.equalsIgnoreCase("1.0")) {
+                Timer timer5 = new Timer();
+                TimerTask timerTask = new TimerTask() {
+                    @Override
+                    public void run() {
+                        ServerFileDeletion.messagesForwarder(serverObj);
+                    }
+                };
+                timer5.schedule(timerTask, 0);
+            }
+
 
             r.rebind(remoteObjName, serverRMI);
         } catch (RemoteException e) {

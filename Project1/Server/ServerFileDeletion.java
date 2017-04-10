@@ -24,7 +24,6 @@ public class ServerFileDeletion {
         st.append(protocolVersion).append(" ").append(serverId).append(" ").append(fileId).append("\r\n\r\n");
         String msg = st.toString();
         mControlCh.send(msg.getBytes());
-        System.out.println("Sent: " + msg);
 
         if(!serverObject.getProtocolVersion().equalsIgnoreCase("1.0"))
             someOldMessages.put(msg, System.currentTimeMillis());
@@ -35,25 +34,6 @@ public class ServerFileDeletion {
         int serverId = serverObject.getServerId();
         Multicast mControlCh = serverObject.getControlChannel();
         ServerDatabase db = serverObject.getDb();
-
-        if(!serverObject.getProtocolVersion().equalsIgnoreCase("1.0")) {
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-                @Override
-                public void run() {
-                    Multicast mControlChannel = serverObject.getControlChannel();
-                    long currentTime = System.currentTimeMillis();
-
-                    for (String msg : someOldMessages.keySet()) {
-                        mControlChannel.send(msg.getBytes());
-                        System.out.println("Sent: " + msg);
-                        if(someOldMessages.get(msg) < currentTime - messageExpirationTime)
-                            someOldMessages.remove(msg);
-                    }
-                }
-            };
-            timer.schedule(timerTask, 0, sendPeriod);
-        }
 
         while (true) {
                 byte[] request = mControlCh.receive();
@@ -72,6 +52,24 @@ public class ServerFileDeletion {
         }
     }
 
+    // for enhanced version
+    public static void messagesForwarder(ServerObject serverObject) {
+        Multicast mControlChannel = serverObject.getControlChannel();
+
+        while(true) {
+            long currentTime = System.currentTimeMillis();
+            for (String msg : someOldMessages.keySet()) {
+                mControlChannel.send(msg.getBytes());
+                if (someOldMessages.get(msg) < currentTime - messageExpirationTime)
+                    someOldMessages.remove(msg);
+            }
+
+            try {
+                Thread.sleep(sendPeriod);
+            } catch (InterruptedException e) {}
+        }
+    }
+
     private static boolean deleteDirectory(File directory) {
         if(directory.exists()){
             File[] files = directory.listFiles();
@@ -87,4 +85,5 @@ public class ServerFileDeletion {
         }
         return true;
     }
+
 }
