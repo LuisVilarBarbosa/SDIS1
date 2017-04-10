@@ -1,8 +1,6 @@
 #!/bin/bash
 cd .. || exit
 cd .. || exit
-echo "Compiling..."
-javac Project1/Client/Client.java Project1/Server/ServerRMI.java
 echo "Almost running..."
 echo "Subprotocols: BACKUP, RESTORE, DELETE, RECLAIM, STATE"
 echo "Subprotocol: "
@@ -35,8 +33,6 @@ elif [ "$subprotocol" = "STATE" ]; then
 else
     echo "Invalid subprotocol.";
 fi
-cd Project1/Client || exit
-echo "Removing .class files..."
-rm *.class
+cd Project1/Scripts || exit
 echo "Press Enter to continue...: "
 read -r enter

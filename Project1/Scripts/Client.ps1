@@ -1,7 +1,5 @@
 cd ..
 cd ..
-echo "Compiling..."
-javac Project1/Client/Client.java Project1/Server/ServerRMI.java
 echo "Almost running..."
 echo "Subprotocols: BACKUP, RESTORE, DELETE, RECLAIM, STATE"
 $subprotocol = Read-Host -Prompt "Subprotocol"
@@ -30,7 +28,5 @@ elseif($subprotocol -ieq "STATE") {
 else {
     echo "Invalid subprotocol."
 }
-cd Project1/Client
-echo "Removing .class files..."
-rm *.class
+cd Project1/Scripts
 pause
