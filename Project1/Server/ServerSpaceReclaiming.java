@@ -46,8 +46,8 @@ public class ServerSpaceReclaiming {
 
                 // send "removed" message to the other peers
                 StringBuilder sb = new StringBuilder("REMOVED ");
-                sb.append(serverObject.getProtocolVersion()).append(serverObject.getServerId()).append(fileId);
-                sb.append(chunkNo).append("\r\n\r\n");
+                sb.append(serverObject.getProtocolVersion()).append(" ").append(serverObject.getServerId()).append(" ");
+                sb.append(fileId).append(" ").append(chunkNo).append("\r\n\r\n");
                 String msg = sb.toString();
                 mControlCh.send(msg.getBytes());
 
@@ -84,16 +84,17 @@ public class ServerSpaceReclaiming {
                     fileChunkData.setPerceivedReplicationDegree(newRepDeg);
 
                     //Notification that other server has attended the request first
-                    byte[] info2 = null;
-                    mControlCh.receive(new Random().nextInt() % Constants.maxDelayTime);
-                    Message m2 = new Message(info2);
-                    System.out.println(m2.getHeader());
-                    if (m2.getMessageType().equalsIgnoreCase("PUTCHUNK") &&
-                            m2.getVersion().equalsIgnoreCase(protocolVersion) &&
-                            m2.getSenderId().equalsIgnoreCase(m1.getSenderId()) &&
-                            m2.getFileId().equalsIgnoreCase(m1.getFileId()) &&
-                            m2.getChunkNo().equalsIgnoreCase(m1.getChunkNo()))
-                        continue;
+                    byte[] info2 = mControlCh.receive(new Random().nextInt() % Constants.maxDelayTime);
+                    if (info2 != null) {
+                        Message m2 = new Message(info2);
+                        System.out.println(m2.getHeader());
+                        if (m2.getMessageType().equalsIgnoreCase("PUTCHUNK") &&
+                                m2.getVersion().equalsIgnoreCase(protocolVersion) &&
+                                m2.getSenderId().equalsIgnoreCase(m1.getSenderId()) &&
+                                m2.getFileId().equalsIgnoreCase(m1.getFileId()) &&
+                                m2.getChunkNo().equalsIgnoreCase(m1.getChunkNo()))
+                            continue;
+                    }
 
                     int desiredRepDeg = dbFileData.getDesiredReplicationDegree();
                     if (newRepDeg < desiredRepDeg) {
